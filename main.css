@@ -1,0 +1,177 @@
+@media screen and (max-device-width: 480px)
+{
+    /* 480pxまでの幅の場合に適応される (対象:スマートフォン) */
+    .main__body
+    {
+        max-width: 100%;
+    }
+}
+
+@media screen and (min-device-width: 481px) and (max-device-width: 1023px)
+{
+    /* 481pxから780pxまでの幅の場合に適応される(対象:タブレット端末) */
+    body 
+    {
+        background-color:#F9DF2C;
+    }
+}
+
+@media screen and (min-device-width:1024px)
+{
+    /* 1024px以上の幅の場合に適応される(対象:PC) */
+    #main
+    {
+        margin:auto;
+    }
+
+    .main__body
+    {
+        max-width: 50%;
+    }
+
+    .main-form__body
+    {
+        width:500px;
+
+    }
+
+    #main-form
+    {
+        position: fixed;
+        right:55px;
+        bottom:70px;
+    }
+
+    .js-show-section
+    {
+        position: fixed;
+        right: 28px;
+        bottom: 34px;
+    }
+
+}
+
+body
+{
+    margin:0;
+    padding:0;
+}
+
+.header
+{
+    margin:0;
+    background-color: #444;
+}
+
+ul,li 
+{
+    margin:0;
+    padding:0;
+}
+
+.js-drawer
+{
+    width:60px;
+    height:60px;
+    border:2px solid rgb(169, 157, 255);
+    border-radius: 40px;
+    background-color: rgb(255, 255, 255);
+}
+
+.js-drawer:focus
+{
+    outline: 0;
+}
+
+.main__body
+{
+    margin:auto;
+    padding:5px;
+
+}
+
+#main-form
+{
+    flex-direction: column;
+    background-color:rgb(238, 247, 255);
+    border:1px solid rgb(180, 180, 180);
+    border-radius: 5px;
+}
+
+.main-form__body.__hidden
+{
+    display: none;
+}
+
+
+.main-form_item
+{
+    display: flex;
+    margin:2px;
+}
+
+div.main-form_item:last-child
+{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.main-form_text
+{
+    width:15%;
+    background-color: rgb(255, 220, 177);
+    margin:1px;
+}
+
+.main-form_input
+{
+    padding:0;
+    margin:1px;
+}
+
+.main-form_textarea
+{
+    width:80%;
+    padding:0;
+    margin:1px;
+    height: 150px;
+}
+
+.main-form_button
+{
+    border:1px solid;
+    border-radius: 2px;
+    padding:5px;
+    width:50px;
+    background-color:white;
+}
+
+#main-content
+{
+    margin:auto;
+    background-color:rgb(194, 194, 194);
+
+}
+
+.__show
+{
+    background-color: rgb(255, 224, 224);
+}
+
+.main-content__item
+{
+    max-width: 800px;
+    background-color:rgb(252, 252, 252);
+    border:1px solid rgba(240, 240, 240, 0.26);
+    border-radius: 2px;
+    padding:5px;
+    margin:5px;
+}
+
+.main-content__text
+{
+
+
+}
