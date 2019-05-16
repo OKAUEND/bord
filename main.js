@@ -2,8 +2,10 @@ window.addEventListener('load',function(){
 
     const thread_data = new thread;
     let submit = document.querySelector("#btnsubmit");
+    let js_drawer = document.querySelector('.js-drawer');
     let reload = document.querySelector('#btnreload');
     let delbtn = document.querySelector('#btndelete');
+
 
     //初回読み込み
     fetchCommentdata(thread_data).then((data) =>
@@ -36,7 +38,7 @@ window.addEventListener('load',function(){
 
         let list = Object.assign(input_list,tmp);
 
-        insertInputData(input_list).then(() =>
+        insertInputData(list).then(() =>
         {
             return fetchCommentdata(thread_data);
         })
@@ -87,54 +89,59 @@ window.addEventListener('load',function(){
     },false);
 
     //削除ボタン
-    delbtn.addEventListener('click',() =>
+    // delbtn.addEventListener('click',() =>
+    // {
+    //     let delete_text = document.querySelector('.delete_pas').value;
+
+    //     //削除パスワードを入力されていないときは処理を終了する
+    //     //製作中はコメント化をして判定を省く
+    //     // if(delete_text.length == 0)
+    //     // {
+    //     //     return;
+    //     // }
+
+    //     let response_id_list = []; 
+
+    //     //チェックした返信レスのIDをピックアップする
+    //     for(let count = 0; count < document.comment_area.delete_check.length ; count++)
+    //     {
+    //         if(document.comment_area.delete_check[count].checked)
+    //         {
+    //             response_id_list.push(document.comment_area.delete_check[count].value);
+    //         }
+    //     }
+
+    //     //該当レスIDがデータベースに存在するかを検索する
+    //     searchRecode(thread_data,response_id_list).then((result) =>
+    //     {
+
+    //         //サーバーから取得したIDが、ピックアップしたレスのIDと合致しているか
+    //         let isIncludes  = result.every((value) =>
+    //         {
+    //             return (response_id_list.includes(value['ID']))
+    //         })
+
+    //         //選んでいたレスがすべてサーバーに存在する場合、削除処理を実施
+    //         if(isIncludes)
+    //         {
+    //             //削除処理を行う
+    //             deleteRecode(thread_data.threadinfo,response_id_list);
+    //         }
+    //     })
+    //     .then((result) =>
+    //     {
+    //         let isIncludes;
+    //     })
+    //     .catch((err) =>
+    //     {
+    //         console.log('サバエラー');
+    //     })
+
+    // },false);
+
+    js_drawer.addEventListener('click',() =>
     {
-        let delete_text = document.querySelector('.delete_pas').value;
-
-        //削除パスワードを入力されていないときは処理を終了する
-        //製作中はコメント化をして判定を省く
-        // if(delete_text.length == 0)
-        // {
-        //     return;
-        // }
-
-        let response_id_list = []; 
-
-        //チェックした返信レスのIDをピックアップする
-        for(let count = 0; count < document.comment_area.delete_check.length ; count++)
-        {
-            if(document.comment_area.delete_check[count].checked)
-            {
-                response_id_list.push(document.comment_area.delete_check[count].value);
-            }
-        }
-
-        //該当レスIDがデータベースに存在するかを検索する
-        searchRecode(thread_data,response_id_list).then((result) =>
-        {
-
-            //サーバーから取得したIDが、ピックアップしたレスのIDと合致しているか
-            let isIncludes  = result.every((value) =>
-            {
-                return (response_id_list.includes(value['ID']))
-            })
-
-            //選んでいたレスがすべてサーバーに存在する場合、削除処理を実施
-            if(isIncludes)
-            {
-                //削除処理を行う
-                deleteRecode(thread_data.threadinfo,response_id_list);
-            }
-        })
-        .then((result) =>
-        {
-            let isIncludes;
-        })
-        .catch((err) =>
-        {
-            console.log('サバエラー');
-        })
-
+        document.querySelector('.main-form__body').classList.toggle('__hidden');
     },false);
 
 },false);

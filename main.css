@@ -73,9 +73,9 @@ ul,li
 {
     width:60px;
     height:60px;
-    border:2px solid rgb(169, 157, 255);
-    border-radius: 40px;
-    background-color: rgb(255, 255, 255);
+    border:2px solid #1da1f2;
+    border-radius: 50%;
+    background-color: #1da1f2;
 }
 
 .js-drawer:focus
@@ -174,4 +174,19 @@ div.main-form_item:last-child
 {
 
 
+}
+
+.icon-compose
+{
+    display: inline-block;
+    font-size: 25px;
+}
+
+.icon-compose::before
+{
+    font-family: "Font Awesome 5 Free";
+    content:"\f044";
+    font-style: normal;
+    font-variant: normal;
+    color:rgb(54, 54, 54);
 }
