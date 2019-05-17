@@ -38,17 +38,16 @@
     #main-form
     {
         position: fixed;
-        right:55px;
-        bottom:70px;
+        right:90px;
+        bottom:40px;
     }
 
-    .js-show-section
+    .js-userinterface
     {
         position: fixed;
         right: 28px;
         bottom: 34px;
     }
-
 }
 
 body
@@ -69,20 +68,6 @@ ul,li
     padding:0;
 }
 
-.js-drawer
-{
-    width:60px;
-    height:60px;
-    border:2px solid #1da1f2;
-    border-radius: 50%;
-    background-color: #1da1f2;
-}
-
-.js-drawer:focus
-{
-    outline: 0;
-}
-
 .main__body
 {
     margin:auto;
@@ -90,6 +75,8 @@ ul,li
 
 }
 
+
+/* 入力フォーム */
 #main-form
 {
     flex-direction: column;
@@ -148,6 +135,8 @@ div.main-form_item:last-child
     background-color:white;
 }
 
+
+/* 返信レス表示 */
 #main-content
 {
     margin:auto;
@@ -176,17 +165,49 @@ div.main-form_item:last-child
 
 }
 
+
+/* ユーザーインターフェイス関係 */
+
+.js-userinterface
+{
+    display: flex;
+    flex-direction: column;
+}
+
+.js-userinterface__item
+{
+    width:60px;
+    height:60px;
+    border:2px solid #1da1f2;
+    border-radius: 50%;
+    background-color: #1da1f2;
+    margin-top:5px;
+    margin-bottom: 5px;
+}
+
+.js-userinterface__item:focus
+{
+    outline: 0;
+}
+
 .icon-compose
 {
     display: inline-block;
     font-size: 25px;
 }
 
-.icon-compose::before
+.js-drawer .icon-compose::before
 {
     font-family: "Font Awesome 5 Free";
     content:"\f044";
     font-style: normal;
     font-variant: normal;
     color:rgb(54, 54, 54);
+}
+
+.js-drawer.__open
+{
+    border:2px solid #1da1f2;
+    border-radius: 0% 50% 50% 0%;
+    background-color: #1da1f2;
 }
