@@ -142,6 +142,7 @@ window.addEventListener('load',function(){
     js_drawer.addEventListener('click',() =>
     {
         document.querySelector('.main-form__body').classList.toggle('__hidden');
+        document.querySelector('.js-drawer').classList.toggle('__open');
     },false);
 
 },false);
