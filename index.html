@@ -9,14 +9,13 @@
     <body>
         <header class="header">
             <ul class="header__list">
-                <li class="header__item">テスト</li>
             </ul>
         </header>
         <section id = "main">
             <article id = "main-content">
             </article>
-            <article id = "main-form">
-                <section class="main-form__body __hidden">
+            <article id = "main-form" class = "__hidden">
+                <section class="main-form__body" >
                     <div class="main-form_item">
                         <label class="main-form_text">投稿者</label>
                         <input type="text" class="main-form_input username" placeholder="投稿者名">
@@ -40,13 +39,15 @@
             </article>
             <section class="js-userinterface">
                 <button class="js-userinterface__item js-scrollupper">
-                    <i class="icon-compose"></i>
+                    <i class="icon-compose icon-scrollupper"></i>
+                </button>
+                <button class="js-userinterface__item js-reload">
+                    <i class="icon-compose icon-reload"></i>
                 </button>
                 <button class="js-userinterface__item js-drawer">
-                    <i class="icon-compose"></i>
+                    <i class="icon-compose icon-formopen"></i>
                 </button>
             </section>
-            <input type="button" id="btnreload" value="更新">
             <footer>
             </footer>
         </section>

@@ -3,7 +3,7 @@ window.addEventListener('load',function(){
     const thread_data = new thread;
     let submit = document.querySelector("#btnsubmit");
     let js_drawer = document.querySelector('.js-drawer');
-    let reload = document.querySelector('#btnreload');
+    let reload = document.querySelector('.js-reload');
     let delbtn = document.querySelector('#btndelete');
 
 
@@ -141,8 +141,9 @@ window.addEventListener('load',function(){
 
     js_drawer.addEventListener('click',() =>
     {
-        document.querySelector('.main-form__body').classList.toggle('__hidden');
+        document.querySelector('#main-form').classList.toggle('__hidden');
         document.querySelector('.js-drawer').classList.toggle('__open');
+        document.querySelector('.icon-formopen').classList.toggle('__open');
     },false);
 
 },false);
