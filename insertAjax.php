@@ -17,26 +17,26 @@ if(!empty($_POST))
     {
         $pdo = new DBconnect();
 
-        // $sql = "INSERT INTO comment (
-        //             thread_id,
-        //             username,
-        //             email,
-        //             comment,
-        //             delete_pass,
-        //             ipaddres,
-        //             create_data,
-        //             update_data )
-        //         VALUE (
-        //             :thread_id,
-        //             :username,
-        //             :email,
-        //             :comment,
-        //             :delete_pass,
-        //             :ipaddres,
-        //             :create_data,
-        //             :update_data
-        //             )";
-        // $time = new DateTime();
+        $sql = "INSERT INTO comment (
+                    thread_id,
+                    username,
+                    email,
+                    comment,
+                    delete_pass,
+                    ipaddres,
+                    create_data,
+                    update_data )
+                VALUE (
+                    :thread_id,
+                    :username,
+                    :email,
+                    :comment,
+                    :delete_pass,
+                    :ipaddres,
+                    :create_data,
+                    :update_data
+                    )";
+        $time = new DateTime();
         $data = array(
             ':thread_id'     => $thread_id ,
             ':username'     => $username ,
@@ -48,10 +48,9 @@ if(!empty($_POST))
             ':update_data'  => $time->format('Y-m-d H:i:s')
         );
 
-        // $stmt = $pdo->plural($sql,$data);
+        $stmt = $pdo->plural($sql,$data);
 
-        // echo json_encode($stmt);
-        echo json_encode(true);
+        echo json_encode($stmt);
         exit;
     }
     catch(Exception $ex)
