@@ -69,6 +69,9 @@ html,body
 {
     margin:0;
     background-color: #444;
+    display: flex;
+    justify-content: center;
+    align-content:center;
 }
 
 .section
@@ -176,8 +179,14 @@ div.main-form_item:last-child
     border:1px solid rgba(240, 240, 240, 0.26);
     border-radius: 2px;
     padding:5px;
-    margin-bottom:5px;
+    margin:5px;
 }
+
+.main-content__item:first-child
+{
+    margin-top: 0px;
+}
+
 
 .main-content__item.__error
 {
@@ -278,6 +287,18 @@ div.main-form_item:last-child
     color:rgb(255, 73, 73);
 }
 
+.icon-banner
+{
+    margin: 5px;
+}
+
+.icon-banner::before
+{
+    font-size: 30px;
+    font-weight: 900;
+    content:"\f27a";
+    color:rgb(255, 249, 249);
+}
 
 .js-drawer.__open
 {
