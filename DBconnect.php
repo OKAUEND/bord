@@ -3,8 +3,8 @@ class DBconnect{
     const DB_NAME   = 'comment_bord';
     const HOST      = 'localhost';
     const UTF       = 'utf8';
-    const USER      = 'root';
-    const PASSWORD  = 'root';
+    const USER      = 'bord';
+    const PASSWORD  = 'bord';
     const OPTION    = array(
                             //
                                 PDO::ATTR_ERRMODE => PDO::ERRMODE_WARNING,
