@@ -209,9 +209,27 @@ div.main-form_item:last-child
 
 .main-content__text
 {
-
-
+    margin:5px;
 }
+
+.main-content__text.__dbnumber
+{
+    font-size: 15px;
+    color:rgb(179, 179, 179);
+}
+
+.main-content__text.__name
+{
+    font-size: 13px;
+    color:rgb(99, 99, 99);
+}
+
+.main-content__text.__time
+{
+    font-size: 13px;
+    color:rgb(179, 179, 179);
+}
+
 
 
 /* ユーザーインターフェイス関係 */

@@ -8,12 +8,13 @@ window.addEventListener('load',function(){
 
 
     //初回読み込み
-    fetchCommentdata(thread_data).then((data) =>
+    fetchCommentdata(thread_data).then((result) =>
     {
-        let tmp = createDOMFragment(data,thread_data);
-        console.log(tmp);
-        newCommentDOM(tmp,thread_data);
-        thread_data.threadinfo = data;
+        let DOMFragment;
+
+        DOMFragment = createDOMFragment(result,thread_data)
+        newCommentDOM(DOMFragment,thread_data);
+        thread_data.threadinfo = result;
     });
 
     //データベースへ登録する 書き込みをする
@@ -282,9 +283,9 @@ function newCommentDOM(DOMFragment)
    let $section = document.createElement('section');
    $section.classList.add('main__body');
    $section.classList.add('__show');
+   $section.appendChild(DOMFragment);
 
    let comment_area = document.querySelector('#main-content');
-   $section.appendChild(DOMFragment);
    comment_area.appendChild($section);
 }
 
@@ -311,17 +312,27 @@ function createDOMFragment(fetchdata,thread_data)
 
         //レスのbody部分を作成する
         let $div = document.createElement('div');
-        $div.classList.add('main-content__item',element['ID']);
+        $div.classList.add('main-content__item');
+
+        //掲示板の通しNOを作成する
+        let $ResNo = document.createElement('span');
+        $ResNo.classList.add('main-content__text');
+        $ResNo.appendChild(document.createTextNode('No ' + response_No));
+
+        //データベースのIDを表示する
+        let $DB_no = document.createElement('span');
+        $DB_no.classList.add('main-content__text','__dbnumber');
+        $DB_no.appendChild(document.createTextNode('No:' + element['ID']));
 
         //投稿者名を作成
         let $span_username   = document.createElement('span');
         $span_username.appendChild(document.createTextNode(element['username']));
-        $span_username.classList.add('main-content__name');
+        $span_username.classList.add('main-content__text','__name');
 
         //投稿時間を作成
         let $span_writingtime = document.createElement('span');
         $span_writingtime.appendChild(document.createTextNode(element['create_data']));
-        $span_writingtime.classList.add('main-content__time');
+        $span_writingtime.classList.add('main-content__text','__time');
 
         //レスを作成
         let $p_comment = document.createElement('p');
@@ -329,10 +340,11 @@ function createDOMFragment(fetchdata,thread_data)
         $p_comment.classList.add('main-content__text');
 
         //作成したDOMをbodyタグに挿入
-
+        $div.appendChild($ResNo);
+        $div.appendChild($p_comment);
+        $div.appendChild($DB_no);
         $div.appendChild($span_username);
         $div.appendChild($span_writingtime);
-        $div.appendChild($p_comment);
 
         //仮想ツリーにbodyを挿入
         fragment.appendChild($div);
@@ -340,7 +352,37 @@ function createDOMFragment(fetchdata,thread_data)
 
     thread_data.responseNo = response_No;
 
-    console.log(fragment);
+    return fragment;
+}
+
+function createErrorDOM()
+{
+    let fragment = document.createDocumentFragment(); 
+    //レスのbody部分を作成する
+    let $div = document.createElement('div');
+    $div.classList.add('main-content__body');
+
+    let $box = document.createElement('div');
+    $box.classList.add('main-content__item');
+    $box.classList.add('__error');
+
+    //エラーアイコンを生成する
+    let $error_icon = document.createElement('i');
+    $error_icon.classList.add('icon-compose')
+    $error_icon.classList.add('icon-error')
+
+    //文字列を生成する
+    let $error_txt   = document.createElement('p');
+    $error_txt.appendChild(document.createTextNode('内容を取得できませんでした。時間を置いて再度更新を行ってください'));
+    $error_txt.classList.add('main-content__errortxt');
+
+    $box.appendChild($error_icon);
+    $box.appendChild($error_txt);
+
+    $div.appendChild($box);
+
+    //仮想ツリーにbodyを挿入
+    fragment.appendChild($div);
 
     return fragment;
 }
@@ -368,6 +410,7 @@ class thread
     set threadinfo(array)
     {
         let data = array[array.length - 1]
+        console.log(array);
         this._last_database_id = Number(data['ID']);
         this._last_update_time = data['create_data'];
     }
