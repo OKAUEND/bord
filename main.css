@@ -1,15 +1,21 @@
 @media screen and (max-device-width: 480px)
 {
     /* 480pxまでの幅の場合に適応される (対象:スマートフォン) */
+    html,body
+    {
+        height: 100%;
+    }
+
     .main__body
     {
         max-width: 100%;
     }
-    .js-userinterface
+    #main-form
     {
+        width:70%;
         position: fixed;
-        right: 28px;
-        bottom: 34px;
+        right:90px;
+        bottom:40px;
     }
 }
 
@@ -24,12 +30,6 @@
         bottom:40px;
     }
 
-    .js-userinterface
-    {
-        position: fixed;
-        right: 28px;
-        bottom: 34px;
-    }
 }
 
 @media screen and (min-device-width:1024px)
@@ -57,16 +57,9 @@
         right:90px;
         bottom:40px;
     }
-
-    .js-userinterface
-    {
-        position: fixed;
-        right: 28px;
-        bottom: 34px;
-    }
 }
 
-body
+html,body
 {
     margin:0;
     padding:0;
@@ -78,17 +71,27 @@ body
     background-color: #444;
 }
 
+.section
+{
+    padding:0;
+}
+
 ul,li 
 {
     margin:0;
     padding:0;
 }
 
+#main
+{
+    height: 100%;
+}
+
+
 .main__body
 {
     margin:auto;
-    padding:5px;
-
+    height: 100%;
 }
 
 
@@ -157,13 +160,14 @@ div.main-form_item:last-child
 {
     margin:auto;
     background-color:#bedcff;
-
+    height: 100%;
 }
 
 .__show
 {
     background-color: rgb(223, 249, 255);
 }
+
 
 .main-content__item
 {
@@ -172,7 +176,26 @@ div.main-form_item:last-child
     border:1px solid rgba(240, 240, 240, 0.26);
     border-radius: 2px;
     padding:5px;
-    margin:5px;
+    margin-bottom:5px;
+}
+
+.main-content__item.__error
+{
+    width: 800px;
+    background-color:rgb(255, 224, 224);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-content: center;
+}
+
+.main-content__body
+{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .main-content__text
@@ -188,6 +211,9 @@ div.main-form_item:last-child
 {
     display: flex;
     flex-direction: column;
+    position: fixed;
+    right: 28px;
+    bottom: 34px;
 }
 
 .js-userinterface__item
@@ -242,6 +268,14 @@ div.main-form_item:last-child
     font-weight: 900;
     content:"\f2f9";
     color:rgb(54, 54, 54);
+}
+
+.icon-error::before
+{
+    font-size: 60px;
+    font-weight: 900;
+    content:"\f06a";
+    color:rgb(255, 73, 73);
 }
 
 
