@@ -6,6 +6,7 @@ window.addEventListener('load',function(){
     let reload = document.querySelector('.js-reload');
     let delbtn = document.querySelector('#btndelete');
 
+    let loading_wait = false;
 
     //初回読み込み
     fetchCommentdata(thread_data).then((result) =>
@@ -63,29 +64,31 @@ window.addEventListener('load',function(){
     //更新ボタン押下時のスレッド内容読み取り
     reload.addEventListener('click' ,() =>
     {
-        let wait = false;
-
-        if(wait)
+        if(loading_wait)
         {
             return false;
         }
+        const icon_reload = document.querySelector('.icon-reload');
+        icon_reload.classList.add('__loading');
+        loading_wait = true;
 
-        wait = true;
         fetchCommentdata(thread_data).then((result) =>
         {
             if(result.length = 0)
             {
-                wait = false;
+                loading_wait = false;
+                icon_reload.classList.remove('__loading');
                 return;
             }
             appendDOMFragment(createDOMFragment(result,thread_data),thread_data);
-            thread_data.threadinfo = data;
-            wait = false;
+            loading_wait = false;
+            icon_reload.classList.remove('__loading');
         })
         .catch((err) =>
         {
             //エラー表示をモーダル画面で表示する(予定)
-            wait = false;
+            icon_reload.classList.remove('__loading');
+            loading_wait = false;
         })
     },false);
 
@@ -291,8 +294,8 @@ function newCommentDOM(DOMFragment)
 
 function appendDOMFragment(DOMFragment)
 {
-    let comment_area = document.querySelector('.main__body');
-    comment_area.appendChild(DOMFragment);
+    document.querySelector('.main__body').appendChild(DOMFragment);
+    console.log('おわった？');
 }
 
 function createDOMFragment(fetchdata,thread_data)
@@ -396,6 +399,7 @@ class thread
     _last_database_id;
     _last_update_time;
     _last_res_no;
+    _updating = {}
 
     constructor()
     {
@@ -434,4 +438,5 @@ class thread
         return this._last_res_no;
     }
 }
+
 
