@@ -262,6 +262,11 @@ div.main-form_item:last-child
     outline: 0;
 }
 
+.__inactive
+{
+    opacity: 0.5;
+}
+
 .icon-compose
 {
     font-family: "Font Awesome 5 Free";

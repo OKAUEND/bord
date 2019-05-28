@@ -1,10 +1,10 @@
 window.addEventListener('load',function(){
 
     const thread_data = new thread;
-    let submit = document.querySelector("#btnsubmit");
-    let js_drawer = document.querySelector('.js-drawer');
-    let reload = document.querySelector('.js-reload');
-    let delbtn = document.querySelector('#btndelete');
+    const submit = document.querySelector("#btnsubmit");
+    const js_drawer = document.querySelector('.js-drawer');
+    const reload = document.querySelector('.js-reload');
+    const delbtn = document.querySelector('#btndelete');
 
     let loading_wait = false;
 
@@ -149,6 +149,35 @@ window.addEventListener('load',function(){
         document.querySelector('.js-drawer').classList.toggle('__open');
         document.querySelector('.icon-formopen').classList.toggle('__open');
     },false);
+
+
+    const scrollUpperBottom = document.querySelector('.js-userinterface__item','.js-scrollupper');
+    const activationLowerLimit = 200;
+
+    scrollUpperBottom.addEventListener('click',() =>
+    {
+        if(document.documentElement.scrollTop < activationLowerLimit)
+        {
+            return;
+        }
+
+            //画面の描写位置をトップに戻す 
+            document.documentElement.scrollTop = 0;
+
+    },false);
+
+    window.document.addEventListener('scroll' ,() =>
+    {
+        if(document.documentElement.scrollTop < activationLowerLimit)
+        {
+            scrollUpperBottom.classList.add('__inactive')
+            return;
+        }
+        scrollUpperBottom.classList.remove('__inactive')
+    },false);
+
+
+    
 
 },false);
 
