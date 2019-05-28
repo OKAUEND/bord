@@ -252,9 +252,6 @@ div.main-form_item:last-child
     background-color: #1da1f2;
     margin-top:5px;
     margin-bottom: 5px;
-    display: flex;
-    justify-content: center;
-    align-content: center;
 }
 
 .js-userinterface__item:focus
@@ -267,12 +264,36 @@ div.main-form_item:last-child
     opacity: 0.5;
 }
 
+.js-drawer.__open
+{
+    border:5px double rgb(119, 119, 119);
+    background-color: #313131;
+}
+
+.js-resdelete
+{
+    background-color: #ffffff00;;
+    border:none;
+    padding: 0;
+    width:15px;
+    height:20px;
+}
+
+.js-resdelete:focus
+{
+    outline: 0;
+}
+
 .icon-compose
 {
     font-family: "Font Awesome 5 Free";
     display: inline-block;
     font-style: normal;
     font-variant: normal;
+}
+
+.__ui
+{
     width:30px;
     height: 30px;
 }
@@ -330,12 +351,6 @@ div.main-form_item:last-child
     color:rgb(255, 249, 249);
 }
 
-.js-drawer.__open
-{
-    border:5px double rgb(119, 119, 119);
-    background-color: #313131;
-}
-
 .__loading
 {
     animation: rotate_anime 1s linear infinite;
@@ -346,8 +361,17 @@ div.main-form_item:last-child
     content:"\f110";
 }
 
+.icon-delete::before
+{
+    font-size: 15px;
+    font-weight: 900;
+    content:"\f2ed";
+    color:rgb(97, 97, 97);
+}
+
 @keyframes rotate_anime
 {
     0% { transform: rotate(0deg)}
     100% { transform: rotate(360deg)}
 }
+

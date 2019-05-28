@@ -4,7 +4,7 @@ window.addEventListener('load',function(){
     const submit = document.querySelector("#btnsubmit");
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
-    const delbtn = document.querySelector('#btndelete');
+    const js_del = document.querySelector('.js-resdelete');
 
     let loading_wait = false;
 
@@ -92,56 +92,39 @@ window.addEventListener('load',function(){
         })
     },false);
 
-    //削除ボタン
-    // delbtn.addEventListener('click',() =>
-    // {
-    //     let delete_text = document.querySelector('.delete_pas').value;
+    削除ボタン
+    js_del.addEventListener('click',() =>
+    {
 
-    //     //削除パスワードを入力されていないときは処理を終了する
-    //     //製作中はコメント化をして判定を省く
-    //     // if(delete_text.length == 0)
-    //     // {
-    //     //     return;
-    //     // }
+        
 
-    //     let response_id_list = []; 
+        //該当レスIDがデータベースに存在するかを検索する
+        searchRecode(thread_data,response_id_list).then((result) =>
+        {
 
-    //     //チェックした返信レスのIDをピックアップする
-    //     for(let count = 0; count < document.comment_area.delete_check.length ; count++)
-    //     {
-    //         if(document.comment_area.delete_check[count].checked)
-    //         {
-    //             response_id_list.push(document.comment_area.delete_check[count].value);
-    //         }
-    //     }
+            //サーバーから取得したIDが、ピックアップしたレスのIDと合致しているか
+            let isIncludes  = result.every((value) =>
+            {
+                return (response_id_list.includes(value['ID']))
+            })
 
-    //     //該当レスIDがデータベースに存在するかを検索する
-    //     searchRecode(thread_data,response_id_list).then((result) =>
-    //     {
+            //選んでいたレスがすべてサーバーに存在する場合、削除処理を実施
+            if(isIncludes)
+            {
+                //削除処理を行う
+                deleteRecode(thread_data.threadinfo,response_id_list);
+            }
+        })
+        .then((result) =>
+        {
+            let isIncludes;
+        })
+        .catch((err) =>
+        {
+            console.log('サバエラー');
+        })
 
-    //         //サーバーから取得したIDが、ピックアップしたレスのIDと合致しているか
-    //         let isIncludes  = result.every((value) =>
-    //         {
-    //             return (response_id_list.includes(value['ID']))
-    //         })
-
-    //         //選んでいたレスがすべてサーバーに存在する場合、削除処理を実施
-    //         if(isIncludes)
-    //         {
-    //             //削除処理を行う
-    //             deleteRecode(thread_data.threadinfo,response_id_list);
-    //         }
-    //     })
-    //     .then((result) =>
-    //     {
-    //         let isIncludes;
-    //     })
-    //     .catch((err) =>
-    //     {
-    //         console.log('サバエラー');
-    //     })
-
-    // },false);
+    },false);
 
     js_drawer.addEventListener('click',() =>
     {
@@ -156,6 +139,7 @@ window.addEventListener('load',function(){
 
     scrollUpperBottom.addEventListener('click',() =>
     {
+        //200未満は画面の移動をさせない
         if(document.documentElement.scrollTop < activationLowerLimit)
         {
             return;
@@ -168,17 +152,18 @@ window.addEventListener('load',function(){
 
     window.document.addEventListener('scroll' ,() =>
     {
+        //200未満はボタンの表示を半透明にし、押せない事を表現
         if(document.documentElement.scrollTop < activationLowerLimit)
         {
             scrollUpperBottom.classList.add('__inactive')
             return;
         }
-        scrollUpperBottom.classList.remove('__inactive')
+        else
+        {
+            //200以上は押せることを表現
+            scrollUpperBottom.classList.remove('__inactive')
+        }
     },false);
-
-
-    
-
 },false);
 
 //非同期スレッド内容取得処理
@@ -366,6 +351,13 @@ function createDOMFragment(fetchdata,thread_data)
         $span_writingtime.appendChild(document.createTextNode(element['create_data']));
         $span_writingtime.classList.add('main-content__text','__time');
 
+        //削除用ボタンを作成
+        let $button_delete = document.createElement('button');
+        $button_delete.classList.add('js-resdelete',element['ID']);
+        let $i_delete_icon = document.createElement('i');
+        $i_delete_icon.classList.add('icon-compose','icon-delete');
+        $button_delete.appendChild($i_delete_icon);
+
         //レスを作成
         let $p_comment = document.createElement('p');
         $p_comment.appendChild(document.createTextNode(element['comment']));
@@ -377,6 +369,7 @@ function createDOMFragment(fetchdata,thread_data)
         $div.appendChild($DB_no);
         $div.appendChild($span_username);
         $div.appendChild($span_writingtime);
+        $div.appendChild($button_delete);
 
         //仮想ツリーにbodyを挿入
         fragment.appendChild($div);
