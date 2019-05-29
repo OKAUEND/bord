@@ -4,7 +4,6 @@ window.addEventListener('load',function(){
     const submit = document.querySelector("#btnsubmit");
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
-    const js_del = document.querySelector('.js-resdelete');
 
     let loading_wait = false;
 
@@ -90,40 +89,6 @@ window.addEventListener('load',function(){
             icon_reload.classList.remove('__loading');
             loading_wait = false;
         })
-    },false);
-
-    削除ボタン
-    js_del.addEventListener('click',() =>
-    {
-
-        
-
-        //該当レスIDがデータベースに存在するかを検索する
-        searchRecode(thread_data,response_id_list).then((result) =>
-        {
-
-            //サーバーから取得したIDが、ピックアップしたレスのIDと合致しているか
-            let isIncludes  = result.every((value) =>
-            {
-                return (response_id_list.includes(value['ID']))
-            })
-
-            //選んでいたレスがすべてサーバーに存在する場合、削除処理を実施
-            if(isIncludes)
-            {
-                //削除処理を行う
-                deleteRecode(thread_data.threadinfo,response_id_list);
-            }
-        })
-        .then((result) =>
-        {
-            let isIncludes;
-        })
-        .catch((err) =>
-        {
-            console.log('サバエラー');
-        })
-
     },false);
 
     js_drawer.addEventListener('click',() =>
@@ -354,6 +319,10 @@ function createDOMFragment(fetchdata,thread_data)
         //削除用ボタンを作成
         let $button_delete = document.createElement('button');
         $button_delete.classList.add('js-resdelete',element['ID']);
+        //モーダルウィンドウ展開のためのイベントリスナーを登録
+        $button_delete.addEventListener('click',deleteWindowOpen,false);
+
+        //削除アイコンを追加
         let $i_delete_icon = document.createElement('i');
         $i_delete_icon.classList.add('icon-compose','icon-delete');
         $button_delete.appendChild($i_delete_icon);
@@ -379,6 +348,16 @@ function createDOMFragment(fetchdata,thread_data)
 
     return fragment;
 }
+
+    // イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
+    function deleteWindowOpen()
+    {
+        console.log('ボタンOK')
+        //モーダルウィンドウを展開する処理へ変更
+        //モーダルウィンドウ表示時はスクロールを行えないように設定
+        document.body.style.overflow = 'hidden';
+    
+    }
 
 function createErrorDOM()
 {
@@ -421,7 +400,6 @@ class thread
     _last_database_id;
     _last_update_time;
     _last_res_no;
-    _updating = {}
 
     constructor()
     {
@@ -431,12 +409,12 @@ class thread
         this._last_database_id = 0;
         this._last_update_time = null;
         this._last_res_no = 0;
+        this._initial_load = false;
     }
 
     set threadinfo(array)
     {
         let data = array[array.length - 1]
-        console.log(array);
         this._last_database_id = Number(data['ID']);
         this._last_update_time = data['create_data'];
     }
@@ -460,5 +438,3 @@ class thread
         return this._last_res_no;
     }
 }
-
-

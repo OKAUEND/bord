@@ -375,3 +375,12 @@ div.main-form_item:last-child
     100% { transform: rotate(360deg)}
 }
 
+/* モーダルウィンドウ */
+.modalwindow__back
+{
+    width:100vw;
+    height:100vh;
+    background-color: rgba(68, 68, 68, 0.5);
+    position:fixed;
+
+}
