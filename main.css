@@ -63,6 +63,7 @@ html,body
 {
     margin:0;
     padding:0;
+    background-color:#bedcff;
 }
 
 .header
@@ -97,6 +98,15 @@ ul,li
     height: 100%;
 }
 
+.__is-show::-webkit-scrollbar
+{
+    opacity: 0;
+}
+
+.__hidden
+{
+    display: none;
+}
 
 /* 入力フォーム */
 #main-form
@@ -106,12 +116,6 @@ ul,li
     border:1px solid rgb(180, 180, 180);
     border-radius: 5px;
 }
-
-#main-form.__hidden
-{
-    display: none;
-}
-
 
 .main-form_item
 {
@@ -375,12 +379,90 @@ div.main-form_item:last-child
     100% { transform: rotate(360deg)}
 }
 
+.icon-close::before
+{
+    font-size: 25px;
+    font-weight: 900;
+    content:"\f00d";
+    color:rgb(97, 97, 97);
+}
+
 /* モーダルウィンドウ */
+.modalwindow
+{
+    position:fixed;
+    top:0;
+    transition: opacity 0.1s ease-out, visibility 0.3s ease-out;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.__is_show
+{
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out, visibility 0.3s ease-out;
+}
+
+.modalwindow__body
+{
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    width:500px;
+    height: 250px;
+    background-color: #f6fafd;
+    border-radius:5px;
+}
+
+.modalwindow__title
+{
+    margin:0;
+    padding:0;
+    height: 15%;
+    background-color: #bedcff;
+    border-radius: 5px 5px 0 0;
+    text-align: center;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.title_text
+{
+    width: 100%;
+    font-weight: bold;
+    font-size: 20px;
+}
+
 .modalwindow__back
 {
     width:100vw;
     height:100vh;
-    background-color: rgba(68, 68, 68, 0.5);
-    position:fixed;
+    pointer-events: auto;
+    background-color: rgba(0, 0, 0, 0.5);
+}
 
+.__is_active
+{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.js_modalWindow-close
+{
+    width:30px;
+    height: 30px;
+    padding:0;
+    background-color: rgba(255, 255, 255, 0);
+    border:0;
+    border-radius: 5px;
+    position: absolute;
+    right: 5px;
+}
+
+.js_modalWindow-close:hover
+{
+    background-color: #cccccc;
+    transition: background-color 0.2s ease-out, visibility 0.3s ease-out;
 }

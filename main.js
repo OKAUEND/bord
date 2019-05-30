@@ -1,6 +1,62 @@
+//スレッドデータ管理クラス
+class thread
+{
+    // Firefoxだと未対応なのでコメントアウト;;
+    // _page_type;
+    // _thread_id;
+    // _response_list;
+    // _last_database_id;
+    // _last_update_time;
+    // _last_res_no;
+
+    constructor()
+    {
+        this._page_type = 'thread'; 
+        this._thread_id = 0;
+        this._response_list = [];
+        this._last_database_id = 0;
+        this._last_update_time = null;
+        this._last_res_no = 0;
+        this._initial_load = false;
+    }
+
+    set threadinfo(array)
+    {
+        let data = array[array.length - 1]
+        this._last_database_id = Number(data['ID']);
+        this._last_update_time = data['create_data'];
+    }
+
+    get threadinfo()
+    {
+        let result = [];
+        result['page_type']     = this._page_type;
+        result['thread_id']     = this._thread_id;
+        result['last_database_id']  = this._last_database_id;
+        result['last_update_time'] = this._last_update_time;
+        return result;
+    }
+
+    set responseNo(res_no)
+    {
+        this._last_res_no = res_no;
+    }
+    get responseNo()
+    {
+        return this._last_res_no;
+    }
+
+    createFetchThread(responsuNo)
+    {
+
+    }
+
+}
+
+const thread_data = new thread;
+
 window.addEventListener('load',function(){
 
-    const thread_data = new thread;
     const submit = document.querySelector("#btnsubmit");
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
@@ -129,6 +185,8 @@ window.addEventListener('load',function(){
             scrollUpperBottom.classList.remove('__inactive')
         }
     },false);
+
+    
 },false);
 
 //非同期スレッド内容取得処理
@@ -347,17 +405,43 @@ function createDOMFragment(fetchdata,thread_data)
     thread_data.responseNo = response_No;
 
     return fragment;
+}    // イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
+function deleteWindowOpen(event)
+{
+    const Delete_Message_title = 'この書き込みを削除しますか？';
+    console.log(event);
+    //モーダルウィンドウを展開する処理へ変更
+    //モーダルウィンドウ表示時はスクロールを行えないように設定
+    //スクロールバーを非表示に
+    document.querySelector('#body').classList.add('__is-show');
+    //モーダルウィンドウの各種を表示
+    document.querySelector('.modalwindow').classList.remove('__is_show');
+    document.querySelector('.modalwindow__body').classList.remove('__is_show');
+    document.querySelector('.modalwindow__back').classList.remove('__is_active');
+
+    document.querySelector('.title_text').appendChild(document.createTextNode(Delete_Message_title));
+
+    //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
+    document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
 }
 
-    // イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
-    function deleteWindowOpen()
-    {
-        console.log('ボタンOK')
-        //モーダルウィンドウを展開する処理へ変更
-        //モーダルウィンドウ表示時はスクロールを行えないように設定
-        document.body.style.overflow = 'hidden';
-    
-    }
+function modalWindowClose()
+{
+    console.log('クローズ');
+    //スクロールバーを表示する
+    document.querySelector('#body').classList.remove('__is-show');
+
+    //モーダルウィンドウを非表示に
+    document.querySelector('.modalwindow').classList.add('__is_show');
+    document.querySelector('.modalwindow__body').classList.add('__is_show');
+    document.querySelector('.modalwindow__back').classList.add('__is_active');
+
+    const modalWindowTitleText = document.querySelector('.title_text');
+    modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
+
+    //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
+    document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);
+}
 
 function createErrorDOM()
 {
@@ -391,50 +475,4 @@ function createErrorDOM()
     return fragment;
 }
 
-//スレッドデータ管理クラス
-class thread
-{
-    _page_type;
-    _thread_id;
-    _response_list;
-    _last_database_id;
-    _last_update_time;
-    _last_res_no;
 
-    constructor()
-    {
-        this._page_type = 'thread'; 
-        this._thread_id = 0;
-        this._response_list = [];
-        this._last_database_id = 0;
-        this._last_update_time = null;
-        this._last_res_no = 0;
-        this._initial_load = false;
-    }
-
-    set threadinfo(array)
-    {
-        let data = array[array.length - 1]
-        this._last_database_id = Number(data['ID']);
-        this._last_update_time = data['create_data'];
-    }
-
-    get threadinfo()
-    {
-        let result = [];
-        result['page_type']     = this._page_type;
-        result['thread_id']     = this._thread_id;
-        result['last_database_id']  = this._last_database_id;
-        result['last_update_time'] = this._last_update_time;
-        return result;
-    }
-
-    set responseNo(res_no)
-    {
-        this._last_res_no = res_no;
-    }
-    get responseNo()
-    {
-        return this._last_res_no;
-    }
-}
