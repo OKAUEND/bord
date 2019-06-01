@@ -46,9 +46,28 @@ class thread
         return this._last_res_no;
     }
 
-    createFetchThread(responsuNo)
+    createFetchThread()
     {
+        const sendingdata = 
+        'fetch_mode='        + encodeURIComponent('all')   + '&' +  
+        'page_type='         + encodeURIComponent(this._page_type)   + '&' +
+        'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
+        'last_res_no='       + encodeURIComponent(this._last_res_no) + '&' +  
+        'last_res_time='     + encodeURIComponent(this._last_update_time) ;
 
+        return sendingdata;
+    }
+
+    createFerchSingleData(resno)
+    {
+        const sendingdata = 
+        'fetch_mode='        + encodeURIComponent('single')   + '&' +  
+        'page_type='         + encodeURIComponent(this._page_type)   + '&' +
+        'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
+        'last_res_no='       + encodeURIComponent(resno) + '&' +  
+        'last_res_time='     + encodeURIComponent(this._last_update_time) ;
+
+        return sendingdata;
     }
 
 }
@@ -64,7 +83,7 @@ window.addEventListener('load',function(){
     let loading_wait = false;
 
     //初回読み込み
-    fetchCommentdata(thread_data).then((result) =>
+    fetchCommentdata(thread_data.createFetchThread()).then((result) =>
     {
         let DOMFragment;
 
@@ -97,7 +116,7 @@ window.addEventListener('load',function(){
 
         insertInputData(list).then(() =>
         {
-            return fetchCommentdata(thread_data);
+            return fetchCommentdata(thread_data.createFetchThread());
         })
         .then((result) => 
         {
@@ -127,7 +146,7 @@ window.addEventListener('load',function(){
         icon_reload.classList.add('__loading');
         loading_wait = true;
 
-        fetchCommentdata(thread_data).then((result) =>
+        fetchCommentdata(thread_data.createFetchThread()).then((result) =>
         {
             if(result.length = 0)
             {
@@ -190,21 +209,17 @@ window.addEventListener('load',function(){
 },false);
 
 //非同期スレッド内容取得処理
-function fetchCommentdata(thread_data)
+function fetchCommentdata(sendingdata)
 {
     return new Promise(function(resolve,reject)
     {
         let xhr = new XMLHttpRequest();
         xhr.open('POST','fetchAjax.php',true);
         xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-        //現在のスレッド情報を取得する
-        let Threadinfo = thread_data.threadinfo;
+
 
         xhr.send(
-            'page_type='         + encodeURIComponent(Threadinfo['page_type'])   + '&' +
-            'thread_id='         + encodeURIComponent(Threadinfo['thread_id'])   + '&' +
-            'last_res_no='       + encodeURIComponent(Threadinfo['last_database_id']) + '&' +  
-            'last_res_time='     + encodeURIComponent(Threadinfo['last_update_time']) 
+            sendingdata
         );
 
         xhr.onreadystatechange = function()
@@ -408,8 +423,8 @@ function createDOMFragment(fetchdata,thread_data)
 }    // イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
 function deleteWindowOpen(event)
 {
-    const Delete_Message_title = 'この書き込みを削除しますか？';
-    console.log(event);
+    const DeleteMessagetitle = 'この書き込みを削除しますか？';
+    const DOMResNo= event.path[1].classList[1];
     //モーダルウィンドウを展開する処理へ変更
     //モーダルウィンドウ表示時はスクロールを行えないように設定
     //スクロールバーを非表示に
@@ -419,10 +434,26 @@ function deleteWindowOpen(event)
     document.querySelector('.modalwindow__body').classList.remove('__is_show');
     document.querySelector('.modalwindow__back').classList.remove('__is_active');
 
-    document.querySelector('.title_text').appendChild(document.createTextNode(Delete_Message_title));
+    document.querySelector('.title_text').appendChild(document.createTextNode(DeleteMessagetitle));
 
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
     document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
+
+    //読み込み中マークを生成する
+    fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
+    {
+        let modalItem = document.querySelector('.modalwindow__item');
+        let $response_text = document.createElement('p');
+        $response_text.classList.add('view_text');
+        $response_text.appendChild(document.createTextNode(result[0]['comment']));
+        console.log($response_text);
+        modalItem.appendChild($response_text);
+    })
+    .catch(($err)=>
+    {
+
+    })
+
 }
 
 function modalWindowClose()
@@ -438,6 +469,13 @@ function modalWindowClose()
 
     const modalWindowTitleText = document.querySelector('.title_text');
     modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
+
+    const modalWindowItemText = document.querySelector('.modalwindow__item');
+    console.log(modalWindowItemText.firstChild);
+    if(modalWindowItemText.firstChild)
+    {
+        modalWindowItemText.removeChild(modalWindowItemText.firstChild);
+    }
 
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
     document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);

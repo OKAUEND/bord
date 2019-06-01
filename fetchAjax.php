@@ -12,24 +12,44 @@ const THREAD_TABLENAME = 'comment';
 
 if(!empty($_POST))
 {
+    $fetch_mode = $_POST['fetch_mode'];
     $page_type      = $_POST['page_type'];
     $thread_id      = $_POST['thread_id'];
     $last_res_no    = $_POST['last_res_no'];
     $last_res_time  = $_POST['last_res_time'];
     
+    $where = '';
+
+    switch($fetch_mode)
+        {
+            case 'all':
+                $where = ' AND ID > :last_res_no';
+                break;
+
+            case 'single':
+                $where = ' AND ID = :last_res_no';
+                break;
+            
+            default:
+                //取得方法が指定されていないので、不正な状態と判断しフロントへ通知する
+                header("HTTP/2 412 Internal Server Error");
+                die();
+        }
+
     try
     {
+
         //SQL文を作成
         $sql = "SELECT 
                     * 
                 FROM 
                     comment 
                 WHERE 
-                    thread_id = :thread_id 
-                AND ID > :last_res_no
-                ";
+                    thread_id = :thread_id";
 
     
+        $sql = $sql.$where;
+
         $db = new DBconnect();
 
         //条件の配列を作成する

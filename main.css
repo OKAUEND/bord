@@ -411,7 +411,6 @@ div.main-form_item:last-child
     flex-direction: column;
     width:500px;
     height: 250px;
-    background-color: #f6fafd;
     border-radius:5px;
 }
 
@@ -426,6 +425,29 @@ div.main-form_item:last-child
     align-items: center;
     display: flex;
     flex-direction: row;
+}
+
+.modalwindow__item
+{
+    margin:0;
+    padding:0;
+    height: 60%;
+    background-color: #f7fbff;
+    justify-content: center;
+    align-items: center;
+    display: flex;
+    flex-direction: row;
+}
+
+.modalwindow__ui
+{
+    margin:0;
+    padding:0;
+    height: 20%;
+    background-color: #f6faff;
+    text-align: center;
+    align-items: center;
+    display: flex;
 }
 
 .title_text
