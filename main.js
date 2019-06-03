@@ -18,6 +18,7 @@ class thread
         this._last_update_time = null;
         this._last_res_no = 0;
         this._initial_load = false;
+        this._IsAjaxProcsessing  = false;
     }
 
     set threadinfo(array)
@@ -44,6 +45,16 @@ class thread
     get responseNo()
     {
         return this._last_res_no;
+    }
+
+    set IsAjaxProcsessing(bool)
+    {
+        this._IsAjaxProcsessing = bool;
+    }
+
+    get IsAjaxProcsessing()
+    {
+        return this._IsAjaxProcsessing;
     }
 
     createFetchThread()
@@ -393,7 +404,7 @@ function createDOMFragment(fetchdata,thread_data)
         let $button_delete = document.createElement('button');
         $button_delete.classList.add('js-resdelete',element['ID']);
         //モーダルウィンドウ展開のためのイベントリスナーを登録
-        $button_delete.addEventListener('click',deleteWindowOpen,false);
+        $button_delete.addEventListener('click',deleteModalWindowOpen,false);
 
         //削除アイコンを追加
         let $i_delete_icon = document.createElement('i');
@@ -420,11 +431,32 @@ function createDOMFragment(fetchdata,thread_data)
     thread_data.responseNo = response_No;
 
     return fragment;
-}    // イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
-function deleteWindowOpen(event)
+}
+// イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
+function deleteModalWindowOpen(event)
 {
     const DeleteMessagetitle = 'この書き込みを削除しますか？';
+    const DeleteSubmitButtomText = '削除';
+    const SubmitButtomDelete = '__deleting';
     const DOMResNo= event.path[1].classList[1];
+
+    //モーダルウィンドウを表示する関数へ
+    modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
+
+
+
+    if(thread_data.IsAjaxProcsessing)
+    {
+        //前の非同期通信が行われているため、処理を行わせない
+        return;
+    }
+
+    //削除内容を表示する処理を行う
+    ShowDeletingContent(DOMResNo)
+}
+
+function modalWindowOpen(titleText,buttonText,submitClassName)
+{
     //モーダルウィンドウを展開する処理へ変更
     //モーダルウィンドウ表示時はスクロールを行えないように設定
     //スクロールバーを非表示に
@@ -434,31 +466,27 @@ function deleteWindowOpen(event)
     document.querySelector('.modalwindow__body').classList.remove('__is_show');
     document.querySelector('.modalwindow__back').classList.remove('__is_active');
 
-    document.querySelector('.title_text').appendChild(document.createTextNode(DeleteMessagetitle));
+    //タイトルを設定する
+    document.querySelector('.title_text').appendChild(document.createTextNode(titleText));
+
+    const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+    //Submitボタンの名前を設定する
+    modalSubmitbutton.appendChild(document.createTextNode(buttonText));
+
+    //Submitのクラス名を設定する
+    modalSubmitbutton.classList.add(submitClassName);
+
+    const classlist = modalSubmitbutton.classList;
+    const Length = classlist.length -1;
+    console.log(classlist[Length]);
+    console.log(classlist.length);
 
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
     document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
-
-    //読み込み中マークを生成する
-    fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
-    {
-        let modalItem = document.querySelector('.modalwindow__item');
-        let $response_text = document.createElement('p');
-        $response_text.classList.add('view_text');
-        $response_text.appendChild(document.createTextNode(result[0]['comment']));
-        console.log($response_text);
-        modalItem.appendChild($response_text);
-    })
-    .catch(($err)=>
-    {
-
-    })
-
 }
 
 function modalWindowClose()
 {
-    console.log('クローズ');
     //スクロールバーを表示する
     document.querySelector('#body').classList.remove('__is-show');
 
@@ -470,8 +498,13 @@ function modalWindowClose()
     const modalWindowTitleText = document.querySelector('.title_text');
     modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
 
+    const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+    modalSubmitbutton.removeChild(modalSubmitbutton.firstChild);
+
+    const classList = modalSubmitbutton.classList;
+    modalSubmitbutton.classList.remove(classList[classList.length -1]);
+
     const modalWindowItemText = document.querySelector('.modalwindow__item');
-    console.log(modalWindowItemText.firstChild);
     if(modalWindowItemText.firstChild)
     {
         modalWindowItemText.removeChild(modalWindowItemText.firstChild);
@@ -479,6 +512,36 @@ function modalWindowClose()
 
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
     document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);
+}
+
+function ShowDeletingContent(DOMResNo)
+{
+    //連続クリックで処理が重複しないように、非同期処理中である事を示すフラグをONにする
+    thread_data.IsAjaxProcsessing = true;
+
+    //読み込み中マークを生成する
+    let modalItem = document.querySelector('.modalwindow__item');
+    let $iconReload = document.createElement('i');
+    $iconReload.classList.add('icon-compose','icon-reload','__loading');
+    modalItem.appendChild($iconReload);
+
+    //DBからコメントを再取得する
+    fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
+    {
+        modalItem.removeChild(modalItem.firstChild);
+        let $response_text = document.createElement('p');
+        $response_text.classList.add('view_text');
+        $response_text.appendChild(document.createTextNode(result[0]['comment']));
+        modalItem.appendChild($response_text);
+
+        //すべての処理が終わったため、フラグをOFFにする
+        thread_data.IsAjaxProcsessing = false;
+    })
+    .catch(($err)=>
+    {
+        //すべての処理が終わったため、フラグをOFFにする
+        thread_data.IsAjaxProcsessing = false;
+    })
 }
 
 function createErrorDOM()
