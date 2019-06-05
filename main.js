@@ -462,9 +462,9 @@ function modalWindowOpen(titleText,buttonText,submitClassName)
     //スクロールバーを非表示に
     document.querySelector('#body').classList.add('__is-show');
     //モーダルウィンドウの各種を表示
-    document.querySelector('.modalwindow').classList.remove('__is_show');
-    document.querySelector('.modalwindow__body').classList.remove('__is_show');
-    document.querySelector('.modalwindow__back').classList.remove('__is_active');
+    document.querySelector('.modalwindow').classList.remove('--is_show');
+    document.querySelector('.modalwindow__body').classList.remove('--is_show');
+    document.querySelector('.modalwindow__back').classList.remove('--is_active');
 
     //タイトルを設定する
     document.querySelector('.title_text').appendChild(document.createTextNode(titleText));
@@ -486,9 +486,9 @@ function modalWindowClose()
     document.querySelector('#body').classList.remove('__is-show');
 
     //モーダルウィンドウを非表示に
-    document.querySelector('.modalwindow').classList.add('__is_show');
-    document.querySelector('.modalwindow__body').classList.add('__is_show');
-    document.querySelector('.modalwindow__back').classList.add('__is_active');
+    document.querySelector('.modalwindow').classList.add('--is_show');
+    document.querySelector('.modalwindow__body').classList.add('--is_show');
+    document.querySelector('.modalwindow__back').classList.add('--is_active');
 
     //モーダルウィンドウのタイトル部分にあたるテキストを削除する
     const modalWindowTitleText = document.querySelector('.title_text');

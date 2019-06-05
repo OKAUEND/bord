@@ -66,6 +66,11 @@ html,body
     background-color:#bedcff;
 }
 
+button
+{
+    outline: 0;
+}
+
 .header
 {
     margin:0;
@@ -98,14 +103,21 @@ ul,li
     height: 100%;
 }
 
-.__is-show::-webkit-scrollbar
+.--is-show::-webkit-scrollbar
 {
     opacity: 0;
 }
 
-.__hidden
+.--hidden
 {
     display: none;
+}
+
+.button_text
+{
+    font-size:14px;
+    font-weight: bold;
+    line-height: 20px;
 }
 
 /* 入力フォーム */
@@ -258,11 +270,6 @@ div.main-form_item:last-child
     margin-bottom: 5px;
 }
 
-.js-userinterface__item:focus
-{
-    outline: 0;
-}
-
 .__inactive
 {
     opacity: 0.5;
@@ -281,11 +288,6 @@ div.main-form_item:last-child
     padding: 0;
     width:15px;
     height:20px;
-}
-
-.js-resdelete:focus
-{
-    outline: 0;
 }
 
 .icon-compose
@@ -397,12 +399,6 @@ div.main-form_item:last-child
     justify-content: center;
     align-items: center;
 }
-.__is_show
-{
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease-out, visibility 0.3s ease-out;
-}
 
 .modalwindow__body
 {
@@ -441,21 +437,24 @@ div.main-form_item:last-child
 .modalwindow__ui
 {
     margin:0;
-    padding:0;
-    height: 45px;
+    padding:5px;
+    height: 50px;
     background-color: #ffffff;
     border-top:1px solid #bdbdbd;
     border-radius:0 0 5px 5px ;
-    text-align: center;
+    justify-content: flex-end;
     align-items: center;
     display: flex;
 }
 
-.title_text
+.modalwindow__text
 {
-    width: 100%;
-    font-weight: bold;
-    font-size: 20px;
+    padding:6px 6px;
+    margin:5px;
+    border:1px solid #bedcff;
+    border-radius: 5px;
+    font-size:16px;
+    background-color: #fafafa;
 }
 
 .modalwindow__back
@@ -466,10 +465,11 @@ div.main-form_item:last-child
     background-color: rgba(0, 0, 0, 0.5);
 }
 
-.__is_active
+.title_text
 {
-    opacity: 0;
-    pointer-events: none;
+    width: 100%;
+    font-weight: bold;
+    font-size: 20px;
 }
 
 .js_modalWindow-close
@@ -489,3 +489,43 @@ div.main-form_item:last-child
     background-color: #cccccc;
     transition: background-color 0.2s ease-out, visibility 0.3s ease-out;
 }
+
+.js-modalButton
+{
+    border-radius: 20px;
+    padding:6px 16px;
+    margin:5px;
+}
+
+.js-modalButton.__Cancel
+{
+    border:3px double #65757f;
+    background-color: #ffffff;
+}
+
+.js-modalButton.__Submit
+{
+    border: 2px solid #1da1f2;
+    background-color: #1da1f2;
+}
+
+.js-modalButton.__deleting
+{
+    border: 2px solid #f21d1d;
+    background-color: #f21d1d;
+    color:#fcf7f7;
+}
+
+.--is_active
+{
+    opacity: 0;
+    pointer-events: none;
+}
+
+.--is_show
+{
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease-out, visibility 0.3s ease-out;
+}
+

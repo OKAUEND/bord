@@ -13,7 +13,7 @@
         <section id = "main">
             <article id = "main-content">
             </article>
-            <article id = "main-form" class = "__hidden">
+            <article id = "main-form" class = "--hidden">
                 <section class="main-form__body" >
                     <div class="main-form_item">
                         <label class="main-form_text">投稿者</label>
@@ -47,8 +47,8 @@
                     <i class="icon-compose __ui icon-formopen"></i>
                 </button>
             </section>
-            <section class="modalwindow __is_show">
-                <div class="modalwindow__body __is_show">
+            <section class="modalwindow --is_show">
+                <div class="modalwindow__body --is_show">
                     <div class="modalwindow__title">
                         <p class="title_text"></p>
                         <button class="js_modalWindow-close">
@@ -56,9 +56,13 @@
                         </button>
                     </div>
                     <div class="modalwindow__item"></div>
-                    <div class="modalwindow__ui"></div>
+                    <div class="modalwindow__ui">
+                        <input type="text" class="modalwindow__text --hidden"></input>
+                        <button class = 'js-modalButton __Cancel button_text'>キャンセル</button>
+                        <button class = 'js-modalButton modalSubmitButtom button_text'></button>
+                    </div>
                 </div>
-                <div class="modalwindow__back __is_active"></div>
+                <div class="modalwindow__back --is_active"></div>
             </section>
             <footer>
             </footer>
