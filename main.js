@@ -19,6 +19,7 @@ class thread
         this._last_res_no = 0;
         this._initial_load = false;
         this._IsAjaxProcsessing  = false;
+        this._DeletingPlanID = 0;
     }
 
     set threadinfo(array)
@@ -55,6 +56,16 @@ class thread
     get IsAjaxProcsessing()
     {
         return this._IsAjaxProcsessing;
+    }
+
+    set DeletingID(ID)
+    {
+        this._DeletingPlanID = ID;
+    }
+
+    get DeletingID()
+    {
+        return this._DeletingPlanID;
     }
 
     createFetchThread()
@@ -216,6 +227,252 @@ window.addEventListener('load',function(){
         }
     },false);
 
+
+    function newCommentDOM(DOMFragment)
+    {
+       let $section = document.createElement('section');
+       $section.classList.add('main__body');
+       $section.classList.add('__show');
+       $section.appendChild(DOMFragment);
+    
+       let comment_area = document.querySelector('#main-content');
+       comment_area.appendChild($section);
+    }
+    
+    function appendDOMFragment(DOMFragment)
+    {
+        document.querySelector('.main__body').appendChild(DOMFragment);
+    }
+    
+    function createDOMFragment(fetchdata,thread_data)
+    {
+        let fragment = document.createDocumentFragment();  
+        let response_No = thread_data.responseNo;
+    
+       //取得した配列をループで回し、DOMを作成し表示する
+        fetchdata.forEach(element => {
+    
+            response_No += 1;
+    
+            if(element['delete_flg'])
+            {
+                return;
+            }
+    
+            //レスのbody部分を作成する
+            let $div = document.createElement('div');
+            $div.classList.add('main-content__item');
+    
+            //掲示板の通しNOを作成する
+            let $ResNo = document.createElement('span');
+            $ResNo.classList.add('main-content__text');
+            $ResNo.appendChild(document.createTextNode('No:' + response_No));
+    
+            //データベースのIDを表示する
+            let $DB_no = document.createElement('span');
+            $DB_no.classList.add('main-content__text','__dbnumber');
+            $DB_no.appendChild(document.createTextNode('No:' + element['ID']));
+    
+            //投稿者名を作成
+            let $span_username   = document.createElement('span');
+            $span_username.appendChild(document.createTextNode(element['username']));
+            $span_username.classList.add('main-content__text','__name');
+    
+            //投稿時間を作成
+            let $span_writingtime = document.createElement('span');
+            $span_writingtime.appendChild(document.createTextNode(element['create_data']));
+            $span_writingtime.classList.add('main-content__text','__time');
+    
+            //削除用ボタンを作成
+            let $button_delete = document.createElement('button');
+            $button_delete.classList.add('js-resdelete',element['ID']);
+            //モーダルウィンドウ展開のためのイベントリスナーを登録
+            $button_delete.addEventListener('click',deleteModalWindowOpen,false);
+    
+            //削除アイコンを追加
+            let $i_delete_icon = document.createElement('i');
+            $i_delete_icon.classList.add('icon-compose','icon-delete');
+            $button_delete.appendChild($i_delete_icon);
+    
+            //レスを作成
+            let $p_comment = document.createElement('p');
+            $p_comment.appendChild(document.createTextNode(element['comment']));
+            $p_comment.classList.add('main-content__text');
+    
+            //作成したDOMをbodyタグに挿入
+            $div.appendChild($ResNo);
+            $div.appendChild($p_comment);
+            $div.appendChild($DB_no);
+            $div.appendChild($span_username);
+            $div.appendChild($span_writingtime);
+            $div.appendChild($button_delete);
+    
+            //仮想ツリーにbodyを挿入
+            fragment.appendChild($div);
+        });
+    
+        thread_data.responseNo = response_No;
+    
+        return fragment;
+    }
+
+    function deleteModalWindowOpen(event)
+    {
+        const DeleteMessagetitle = 'この書き込みを削除しますか？';
+        const DeleteSubmitButtomText = '削除';
+        const SubmitButtomDelete = '__deleting';
+        const DOMResNo= event.path[1].classList[1];
+    
+        //モーダルウィンドウを表示する汎用の関数へ
+        modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
+    
+        //削除キー入力フォームを表示する
+        document.querySelector('.modalwindow__text').classList.remove('--hidden');
+    
+        //Submitボタンへイベントを登録
+        // document.querySelector('.modalSubmitButtom').addEventListener('click',,true);
+    
+        if(thread_data.IsAjaxProcsessing)
+        {
+            //前の非同期通信が行われているため、処理を行わせない
+            return;
+        }
+    
+        //削除内容を表示する処理を行う
+        ShowDeletingContent(DOMResNo)
+    }
+    
+    function modalWindowOpen(titleText,buttonText,submitClassName)
+    {
+        //モーダルウィンドウを展開する処理へ変更
+        //モーダルウィンドウ表示時はスクロールを行えないように設定
+        //スクロールバーを非表示に
+        document.querySelector('#body').classList.add('__is-show');
+        //モーダルウィンドウの各種を表示
+        document.querySelector('.modalwindow').classList.remove('--is_show');
+        document.querySelector('.modalwindow__body').classList.remove('--is_show');
+        document.querySelector('.modalwindow__back').classList.remove('--is_active');
+    
+        //タイトルを設定する
+        document.querySelector('.title_text').appendChild(document.createTextNode(titleText));
+    
+        const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+        //Submitボタンの名前を設定する
+        modalSubmitbutton.appendChild(document.createTextNode(buttonText));
+    
+        //Submitのクラス名を設定する
+        modalSubmitbutton.classList.add(submitClassName);
+    
+        //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
+        document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
+    }
+    
+    function modalWindowClose()
+    {
+        //スクロールバーを表示する
+        document.querySelector('#body').classList.remove('__is-show');
+    
+        //モーダルウィンドウを非表示に
+        document.querySelector('.modalwindow').classList.add('--is_show');
+        document.querySelector('.modalwindow__body').classList.add('--is_show');
+        document.querySelector('.modalwindow__back').classList.add('--is_active');
+    
+        //モーダルウィンドウのタイトル部分にあたるテキストを削除する
+        const modalWindowTitleText = document.querySelector('.title_text');
+        modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
+    
+        //Submit用ボタンのテキストを削除する
+        const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+        modalSubmitbutton.removeChild(modalSubmitbutton.firstChild);
+    
+        //Submit用ボタンのスタイル指定を解除する
+        const classList = modalSubmitbutton.classList;
+        modalSubmitbutton.classList.remove(classList[classList.length -1]);
+    
+        //表示しているアイテムをすべて削除する
+        const modalWindowNodeList = document.querySelector('.modalwindow__item');
+        modalWindowNodeList.textContent = null;
+    
+        //削除キー入力欄が表示されていた場合、非表示にする
+        const modalwindowDelInputform = document.querySelector('.modalwindow__text');
+        if(!modalwindowDelInputform.classList.contains('--hidden'))
+        {
+            modalwindowDelInputform.classList.add('--hidden');
+        }
+    
+        //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
+        document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);
+    }
+    
+    function ShowDeletingContent(DOMResNo)
+    {
+        //連続クリックで処理が重複しないように、非同期処理中である事を示すフラグをONにする
+        thread_data.IsAjaxProcsessing = true;
+    
+        //読み込み中マークを生成する
+        let modalItem = document.querySelector('.modalwindow__item');
+        let $iconReload = document.createElement('i');
+        $iconReload.classList.add('icon-compose','icon-reload','__loading');
+        modalItem.appendChild($iconReload);
+    
+        //DBからコメントを再取得する
+        fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
+        {
+            modalItem.removeChild(modalItem.firstChild);
+            let $response_text = document.createElement('p');
+            $response_text.classList.add('view_text');
+            $response_text.appendChild(document.createTextNode(result[0]['comment']));
+    
+            let $resoponse_time = document.createElement('p');
+            $resoponse_time.classList.add('main-content__text','__time');
+            $resoponse_time.appendChild(document.createTextNode(result[0]['create_data']));
+    
+            modalItem.appendChild($response_text);
+            modalItem.appendChild($resoponse_time);
+    
+            //すべての処理が終わったため、フラグをOFFにする
+            thread_data.IsAjaxProcsessing = false;
+        })
+        .catch(($err)=>
+        {
+            //すべての処理が終わったため、フラグをOFFにする
+            thread_data.IsAjaxProcsessing = false;
+        })
+    }
+    
+    
+
+    function createErrorDOM()
+    {
+        let fragment = document.createDocumentFragment(); 
+        //レスのbody部分を作成する
+        let $div = document.createElement('div');
+        $div.classList.add('main-content__body');
+    
+        let $box = document.createElement('div');
+        $box.classList.add('main-content__item');
+        $box.classList.add('__error');
+    
+        //エラーアイコンを生成する
+        let $error_icon = document.createElement('i');
+        $error_icon.classList.add('icon-compose')
+        $error_icon.classList.add('icon-error')
+    
+        //文字列を生成する
+        let $error_txt   = document.createElement('p');
+        $error_txt.appendChild(document.createTextNode('内容を取得できませんでした。時間を置いて再度更新を行ってください'));
+        $error_txt.classList.add('main-content__errortxt');
+    
+        $box.appendChild($error_icon);
+        $box.appendChild($error_txt);
+    
+        $div.appendChild($box);
+    
+        //仮想ツリーにbodyを挿入
+        fragment.appendChild($div);
+    
+        return fragment;
+    }
     
 },false);
 
@@ -344,245 +601,5 @@ function searchRecode(thread_data,data)
     })
 }
 
-function newCommentDOM(DOMFragment)
-{
-   let $section = document.createElement('section');
-   $section.classList.add('main__body');
-   $section.classList.add('__show');
-   $section.appendChild(DOMFragment);
-
-   let comment_area = document.querySelector('#main-content');
-   comment_area.appendChild($section);
-}
-
-function appendDOMFragment(DOMFragment)
-{
-    document.querySelector('.main__body').appendChild(DOMFragment);
-    console.log('おわった？');
-}
-
-function createDOMFragment(fetchdata,thread_data)
-{
-    let fragment = document.createDocumentFragment();  
-    let response_No = thread_data.responseNo;
-
-   //取得した配列をループで回し、DOMを作成し表示する
-    fetchdata.forEach(element => {
-
-        response_No += 1;
-
-        if(element['delete_flg'])
-        {
-            return;
-        }
-
-        //レスのbody部分を作成する
-        let $div = document.createElement('div');
-        $div.classList.add('main-content__item');
-
-        //掲示板の通しNOを作成する
-        let $ResNo = document.createElement('span');
-        $ResNo.classList.add('main-content__text');
-        $ResNo.appendChild(document.createTextNode('No:' + response_No));
-
-        //データベースのIDを表示する
-        let $DB_no = document.createElement('span');
-        $DB_no.classList.add('main-content__text','__dbnumber');
-        $DB_no.appendChild(document.createTextNode('No:' + element['ID']));
-
-        //投稿者名を作成
-        let $span_username   = document.createElement('span');
-        $span_username.appendChild(document.createTextNode(element['username']));
-        $span_username.classList.add('main-content__text','__name');
-
-        //投稿時間を作成
-        let $span_writingtime = document.createElement('span');
-        $span_writingtime.appendChild(document.createTextNode(element['create_data']));
-        $span_writingtime.classList.add('main-content__text','__time');
-
-        //削除用ボタンを作成
-        let $button_delete = document.createElement('button');
-        $button_delete.classList.add('js-resdelete',element['ID']);
-        //モーダルウィンドウ展開のためのイベントリスナーを登録
-        $button_delete.addEventListener('click',deleteModalWindowOpen,false);
-
-        //削除アイコンを追加
-        let $i_delete_icon = document.createElement('i');
-        $i_delete_icon.classList.add('icon-compose','icon-delete');
-        $button_delete.appendChild($i_delete_icon);
-
-        //レスを作成
-        let $p_comment = document.createElement('p');
-        $p_comment.appendChild(document.createTextNode(element['comment']));
-        $p_comment.classList.add('main-content__text');
-
-        //作成したDOMをbodyタグに挿入
-        $div.appendChild($ResNo);
-        $div.appendChild($p_comment);
-        $div.appendChild($DB_no);
-        $div.appendChild($span_username);
-        $div.appendChild($span_writingtime);
-        $div.appendChild($button_delete);
-
-        //仮想ツリーにbodyを挿入
-        fragment.appendChild($div);
-    });
-
-    thread_data.responseNo = response_No;
-
-    return fragment;
-}
-// イベントハンドラーを登録し、動的に生成したボタンでもイベントを発火できるようにする
-function deleteModalWindowOpen(event)
-{
-    const DeleteMessagetitle = 'この書き込みを削除しますか？';
-    const DeleteSubmitButtomText = '削除';
-    const SubmitButtomDelete = '__deleting';
-    const DOMResNo= event.path[1].classList[1];
-
-    //モーダルウィンドウを表示する関数へ
-    modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
-
-    document.querySelector('.modalwindow__text').classList.remove('--hidden');
-
-    if(thread_data.IsAjaxProcsessing)
-    {
-        //前の非同期通信が行われているため、処理を行わせない
-        return;
-    }
-
-    //削除内容を表示する処理を行う
-    ShowDeletingContent(DOMResNo)
-}
-
-function modalWindowOpen(titleText,buttonText,submitClassName)
-{
-    //モーダルウィンドウを展開する処理へ変更
-    //モーダルウィンドウ表示時はスクロールを行えないように設定
-    //スクロールバーを非表示に
-    document.querySelector('#body').classList.add('__is-show');
-    //モーダルウィンドウの各種を表示
-    document.querySelector('.modalwindow').classList.remove('--is_show');
-    document.querySelector('.modalwindow__body').classList.remove('--is_show');
-    document.querySelector('.modalwindow__back').classList.remove('--is_active');
-
-    //タイトルを設定する
-    document.querySelector('.title_text').appendChild(document.createTextNode(titleText));
-
-    const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
-    //Submitボタンの名前を設定する
-    modalSubmitbutton.appendChild(document.createTextNode(buttonText));
-
-    //Submitのクラス名を設定する
-    modalSubmitbutton.classList.add(submitClassName);
-
-    //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
-    document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
-}
-
-function modalWindowClose()
-{
-    //スクロールバーを表示する
-    document.querySelector('#body').classList.remove('__is-show');
-
-    //モーダルウィンドウを非表示に
-    document.querySelector('.modalwindow').classList.add('--is_show');
-    document.querySelector('.modalwindow__body').classList.add('--is_show');
-    document.querySelector('.modalwindow__back').classList.add('--is_active');
-
-    //モーダルウィンドウのタイトル部分にあたるテキストを削除する
-    const modalWindowTitleText = document.querySelector('.title_text');
-    modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
-
-    //Submit用ボタンのテキストを削除する
-    const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
-    modalSubmitbutton.removeChild(modalSubmitbutton.firstChild);
-
-    //Submit用ボタンのスタイル指定を解除する
-    const classList = modalSubmitbutton.classList;
-    modalSubmitbutton.classList.remove(classList[classList.length -1]);
-
-    //表示しているアイテムをすべて削除する
-    const modalWindowNodeList = document.querySelector('.modalwindow__item');
-    modalWindowNodeList.textContent = null;
-
-    //削除キー入力欄が表示されていた場合、非表示にする
-    const modalwindowDelInputform = document.querySelector('.modalwindow__text');
-    if(!modalwindowDelInputform.classList.contains('--hidden'))
-    {
-        modalwindowDelInputform.classList.add('--hidden');
-    }
-
-    //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
-    document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);
-}
-
-function ShowDeletingContent(DOMResNo)
-{
-    //連続クリックで処理が重複しないように、非同期処理中である事を示すフラグをONにする
-    thread_data.IsAjaxProcsessing = true;
-
-    //読み込み中マークを生成する
-    let modalItem = document.querySelector('.modalwindow__item');
-    let $iconReload = document.createElement('i');
-    $iconReload.classList.add('icon-compose','icon-reload','__loading');
-    modalItem.appendChild($iconReload);
-
-    //DBからコメントを再取得する
-    fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
-    {
-        modalItem.removeChild(modalItem.firstChild);
-        let $response_text = document.createElement('p');
-        $response_text.classList.add('view_text');
-        $response_text.appendChild(document.createTextNode(result[0]['comment']));
-
-        let $resoponse_time = document.createElement('p');
-        $resoponse_time.classList.add('main-content__text','__time');
-        $resoponse_time.appendChild(document.createTextNode(result[0]['create_data']));
-
-        modalItem.appendChild($response_text);
-        modalItem.appendChild($resoponse_time);
-
-        //すべての処理が終わったため、フラグをOFFにする
-        thread_data.IsAjaxProcsessing = false;
-    })
-    .catch(($err)=>
-    {
-        //すべての処理が終わったため、フラグをOFFにする
-        thread_data.IsAjaxProcsessing = false;
-    })
-}
-
-function createErrorDOM()
-{
-    let fragment = document.createDocumentFragment(); 
-    //レスのbody部分を作成する
-    let $div = document.createElement('div');
-    $div.classList.add('main-content__body');
-
-    let $box = document.createElement('div');
-    $box.classList.add('main-content__item');
-    $box.classList.add('__error');
-
-    //エラーアイコンを生成する
-    let $error_icon = document.createElement('i');
-    $error_icon.classList.add('icon-compose')
-    $error_icon.classList.add('icon-error')
-
-    //文字列を生成する
-    let $error_txt   = document.createElement('p');
-    $error_txt.appendChild(document.createTextNode('内容を取得できませんでした。時間を置いて再度更新を行ってください'));
-    $error_txt.classList.add('main-content__errortxt');
-
-    $box.appendChild($error_icon);
-    $box.appendChild($error_txt);
-
-    $div.appendChild($box);
-
-    //仮想ツリーにbodyを挿入
-    fragment.appendChild($div);
-
-    return fragment;
-}
 
 
