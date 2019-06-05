@@ -179,7 +179,7 @@ window.addEventListener('load',function(){
 
     js_drawer.addEventListener('click',() =>
     {
-        document.querySelector('#main-form').classList.toggle('__hidden');
+        document.querySelector('#main-form').classList.toggle('--hidden');
         document.querySelector('.js-drawer').classList.toggle('__open');
         document.querySelector('.icon-formopen').classList.toggle('__open');
     },false);
@@ -383,7 +383,7 @@ function createDOMFragment(fetchdata,thread_data)
         //掲示板の通しNOを作成する
         let $ResNo = document.createElement('span');
         $ResNo.classList.add('main-content__text');
-        $ResNo.appendChild(document.createTextNode('No ' + response_No));
+        $ResNo.appendChild(document.createTextNode('No:' + response_No));
 
         //データベースのIDを表示する
         let $DB_no = document.createElement('span');
@@ -443,7 +443,7 @@ function deleteModalWindowOpen(event)
     //モーダルウィンドウを表示する関数へ
     modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
 
-
+    document.querySelector('.modalwindow__text').classList.remove('--hidden');
 
     if(thread_data.IsAjaxProcsessing)
     {
@@ -476,11 +476,6 @@ function modalWindowOpen(titleText,buttonText,submitClassName)
     //Submitのクラス名を設定する
     modalSubmitbutton.classList.add(submitClassName);
 
-    const classlist = modalSubmitbutton.classList;
-    const Length = classlist.length -1;
-    console.log(classlist[Length]);
-    console.log(classlist.length);
-
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
     document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
 }
@@ -495,19 +490,27 @@ function modalWindowClose()
     document.querySelector('.modalwindow__body').classList.add('__is_show');
     document.querySelector('.modalwindow__back').classList.add('__is_active');
 
+    //モーダルウィンドウのタイトル部分にあたるテキストを削除する
     const modalWindowTitleText = document.querySelector('.title_text');
     modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
 
+    //Submit用ボタンのテキストを削除する
     const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
     modalSubmitbutton.removeChild(modalSubmitbutton.firstChild);
 
+    //Submit用ボタンのスタイル指定を解除する
     const classList = modalSubmitbutton.classList;
     modalSubmitbutton.classList.remove(classList[classList.length -1]);
 
-    const modalWindowItemText = document.querySelector('.modalwindow__item');
-    if(modalWindowItemText.firstChild)
+    //表示しているアイテムをすべて削除する
+    const modalWindowNodeList = document.querySelector('.modalwindow__item');
+    modalWindowNodeList.textContent = null;
+
+    //削除キー入力欄が表示されていた場合、非表示にする
+    const modalwindowDelInputform = document.querySelector('.modalwindow__text');
+    if(!modalwindowDelInputform.classList.contains('--hidden'))
     {
-        modalWindowItemText.removeChild(modalWindowItemText.firstChild);
+        modalwindowDelInputform.classList.add('--hidden');
     }
 
     //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
@@ -532,7 +535,13 @@ function ShowDeletingContent(DOMResNo)
         let $response_text = document.createElement('p');
         $response_text.classList.add('view_text');
         $response_text.appendChild(document.createTextNode(result[0]['comment']));
+
+        let $resoponse_time = document.createElement('p');
+        $resoponse_time.classList.add('main-content__text','__time');
+        $resoponse_time.appendChild(document.createTextNode(result[0]['create_data']));
+
         modalItem.appendChild($response_text);
+        modalItem.appendChild($resoponse_time);
 
         //すべての処理が終わったため、フラグをOFFにする
         thread_data.IsAjaxProcsessing = false;
