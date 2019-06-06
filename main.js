@@ -20,6 +20,7 @@ class thread
         this._initial_load = false;
         this._IsAjaxProcsessing  = false;
         this._DeletingPlanID = 0;
+        this._activationLowerLimit = 200;
     }
 
     set threadinfo(array)
@@ -66,6 +67,16 @@ class thread
     get DeletingID()
     {
         return this._DeletingPlanID;
+    }
+
+    get Thread_id()
+    {
+        return this._thread_id;
+    }
+
+    IsActivationLowerLimit(scrollValue)
+    {
+        return scrollValue < this._activationLowerLimit ;
     }
 
     createFetchThread()
@@ -197,12 +208,11 @@ window.addEventListener('load',function(){
 
 
     const scrollUpperBottom = document.querySelector('.js-userinterface__item','.js-scrollupper');
-    const activationLowerLimit = 200;
 
     scrollUpperBottom.addEventListener('click',() =>
     {
         //200未満は画面の移動をさせない
-        if(document.documentElement.scrollTop < activationLowerLimit)
+        if(thread_data.IsActivationLowerLimit(document.documentElement.scrollTop))
         {
             return;
         }
@@ -215,7 +225,7 @@ window.addEventListener('load',function(){
     window.document.addEventListener('scroll' ,() =>
     {
         //200未満はボタンの表示を半透明にし、押せない事を表現
-        if(document.documentElement.scrollTop < activationLowerLimit)
+        if(thread_data.IsActivationLowerLimit(document.documentElement.scrollTop))
         {
             scrollUpperBottom.classList.add('__inactive')
             return;
@@ -228,6 +238,11 @@ window.addEventListener('load',function(){
     },false);
 
 
+    /**
+     * 関数群
+     * イベント等で発火した処理を行うなど
+     * 
+     * **/
     function newCommentDOM(DOMFragment)
     {
        let $section = document.createElement('section');
@@ -316,12 +331,20 @@ window.addEventListener('load',function(){
         return fragment;
     }
 
+    function deleteEvent(event)
+    {
+        deleteRecode(thread_data).then((result) =>
+        {
+
+        })
+    }
+
     function deleteModalWindowOpen(event)
     {
         const DeleteMessagetitle = 'この書き込みを削除しますか？';
         const DeleteSubmitButtomText = '削除';
         const SubmitButtomDelete = '__deleting';
-        const DOMResNo= event.path[1].classList[1];
+        const DOMResNo = event.path[1].classList[1];
     
         //モーダルウィンドウを表示する汎用の関数へ
         modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
@@ -330,7 +353,7 @@ window.addEventListener('load',function(){
         document.querySelector('.modalwindow__text').classList.remove('--hidden');
     
         //Submitボタンへイベントを登録
-        // document.querySelector('.modalSubmitButtom').addEventListener('click',,true);
+        document.querySelector('.modalButtom__Submit').addEventListener('click',deleteEvent,true);
     
         if(thread_data.IsAjaxProcsessing)
         {
@@ -356,7 +379,7 @@ window.addEventListener('load',function(){
         //タイトルを設定する
         document.querySelector('.title_text').appendChild(document.createTextNode(titleText));
     
-        const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+        const modalSubmitbutton = document.querySelector('.modalButtom__Submit');
         //Submitボタンの名前を設定する
         modalSubmitbutton.appendChild(document.createTextNode(buttonText));
     
@@ -365,6 +388,8 @@ window.addEventListener('load',function(){
     
         //モーダルウィンドウのバック黒画面をクリックしたときのイベントを追加する
         document.querySelector('.modalwindow__back').addEventListener('click',modalWindowClose,false);
+        document.querySelector('.modalButtom__Cancel').addEventListener('click',modalWindowClose,false);
+        document.querySelector('.js_modalWindow__close').addEventListener('click',modalWindowClose,false);
     }
     
     function modalWindowClose()
@@ -382,7 +407,7 @@ window.addEventListener('load',function(){
         modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
     
         //Submit用ボタンのテキストを削除する
-        const modalSubmitbutton = document.querySelector('.modalSubmitButtom');
+        const modalSubmitbutton = document.querySelector('.modalButtom__Submit');
         modalSubmitbutton.removeChild(modalSubmitbutton.firstChild);
     
         //Submit用ボタンのスタイル指定を解除する
@@ -418,7 +443,21 @@ window.addEventListener('load',function(){
         //DBからコメントを再取得する
         fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
         {
+            /*データを取得できたか
+            * できなかった場合はエラー文を表示する
+            */
+            if(result.length = 0)
+            {
+                return;
+            }
+
+            //ローディングアイコンを削除する
             modalItem.removeChild(modalItem.firstChild);
+
+            /*表示する内容のDOMを作成する
+            * $response_text : 返信コメント
+            * $resoponse_time: 投稿時間
+            */
             let $response_text = document.createElement('p');
             $response_text.classList.add('view_text');
             $response_text.appendChild(document.createTextNode(result[0]['comment']));
@@ -429,6 +468,9 @@ window.addEventListener('load',function(){
     
             modalItem.appendChild($response_text);
             modalItem.appendChild($resoponse_time);
+
+            //削除IDをクラスで保存しておく
+            thread_data.DeletingID = result[0]['ID'];
     
             //すべての処理が終わったため、フラグをOFFにする
             thread_data.IsAjaxProcsessing = false;
@@ -543,17 +585,21 @@ function insertInputData($array)
     })
 }
 
-function deleteRecode(threadinfo,data)
+function deleteRecode(thread_data)
 {
     return new Promise((resolve,reject) =>
     {
         let xhr = new XMLHttpRequest();
-        xhr.open('POST','deleteAjax.php',true);
+        /*論理削除でレコード削除を行う
+        *
+        */
+        xhr.open('POST','updateAjax.php',true);
+        //xhr.open('POST','deleteAjax.php',true);
         xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
 
         xhr.send(
-            'thread_id=' + encodeURIComponent(threadinfo['thread_id']) + '&' + 
-            'data='      + encodeURIComponent(data)
+            'thread_id='      + encodeURIComponent(thread_data.Thread_id) + '&' + 
+            'DeletingID='     + encodeURIComponent(thread_data.DeletingID)
         );
     
         xhr.onreadystatechange = function()
