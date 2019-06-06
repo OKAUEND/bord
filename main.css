@@ -465,6 +465,12 @@ div.main-form_item:last-child
     background-color: rgba(0, 0, 0, 0.5);
 }
 
+.modalButtom__Cancel
+{
+    border:3px double #65757f;
+    background-color: #ffffff;
+}
+
 .title_text
 {
     width: 100%;
@@ -472,7 +478,7 @@ div.main-form_item:last-child
     font-size: 20px;
 }
 
-.js_modalWindow-close
+.js_modalWindow__close
 {
     width:30px;
     height: 30px;
@@ -495,12 +501,6 @@ div.main-form_item:last-child
     border-radius: 20px;
     padding:6px 16px;
     margin:5px;
-}
-
-.js-modalButton.__Cancel
-{
-    border:3px double #65757f;
-    background-color: #ffffff;
 }
 
 .js-modalButton.__Submit
