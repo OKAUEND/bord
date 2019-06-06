@@ -14,40 +14,21 @@ if(empty($_POST))
 }
 
 $thread_id = $_POST['thread_id'];
-$response_no = explode(',',$_POST['data']);
+$DeletingID = $_POST['DeletingID'];
 
 try
 {
-
     $pdo = new DBconnect();
 
     $table = 'comment';
-    $column = 'delete_flg';
+    $column = 'delete_flg  = true ';
+    $Where = 'ID = :ID';
 
-    $count = 1;
+    $data = array(
+        ':ID' => $DeletingID
+    );
 
-    $data = array();
-
-    $in = '';
-
-    foreach($response_no as $value)
-    {
-        if(!empty($in))
-        {
-            $in =  $in.',';
-        }
-
-        $in = $in.':ID'.$count;
-
-        $data += array(
-            ':ID'.$count => $value
-        );
-        $count += 1;
-    }
-
-    $in = 'ID IN ( '.$in.' )';
-
-    $sql = 'UPDATE '.$table.' SET '.$column.' = true WHERE '.$in;
+    $sql = 'UPDATE '.$table.' SET '.$column.'WHERE '.$Where;
 
     $stmt = $pdo->plural($sql,$data);
 
