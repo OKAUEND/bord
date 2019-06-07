@@ -103,6 +103,18 @@ class thread
         return sendingdata;
     }
 
+    validateSearchResult(data)
+    {
+        if(typeof data === 'undefined')
+        {
+            return '返信コメントの削除が完了しました。'
+        }
+        else
+        {
+            return '削除に失敗しました。'
+        }
+    }
+
 }
 
 const thread_data = new thread;
@@ -216,7 +228,6 @@ window.addEventListener('load',function(){
         {
             return;
         }
-
             //画面の描写位置をトップに戻す 
             document.documentElement.scrollTop = 0;
 
@@ -333,7 +344,16 @@ window.addEventListener('load',function(){
 
     function deleteEvent(event)
     {
-        deleteRecode(thread_data).then((result) =>
+        deleteRecode(thread_data).then(() =>
+        {
+            searchRecode(thread_data.Thread_id,thread_data.DeletingID);
+        })
+        .then((result) =>
+        {
+            modalWindowClose();
+            thread_data.validateSearchResult(result);
+        })
+        .catch(($err) =>
         {
 
         })
@@ -360,7 +380,7 @@ window.addEventListener('load',function(){
             //前の非同期通信が行われているため、処理を行わせない
             return;
         }
-    
+
         //削除内容を表示する処理を行う
         ShowDeletingContent(DOMResNo)
     }
@@ -446,11 +466,10 @@ window.addEventListener('load',function(){
             /*データを取得できたか
             * できなかった場合はエラー文を表示する
             */
-            if(result.length = 0)
-            {
-                return;
-            }
-
+            // if(result.length = 0)
+            // {
+            //     return;
+            // }
             //ローディングアイコンを削除する
             modalItem.removeChild(modalItem.firstChild);
 
@@ -468,6 +487,8 @@ window.addEventListener('load',function(){
     
             modalItem.appendChild($response_text);
             modalItem.appendChild($resoponse_time);
+
+            console.log(result);
 
             //削除IDをクラスで保存しておく
             thread_data.DeletingID = result[0]['ID'];
@@ -577,6 +598,7 @@ function insertInputData($array)
                     if(req.status == 200)
                     {
                         let result = JSON.parse(req.responseText);
+                        console.log(result);
                         resolve(result);
                     }
                     break;
@@ -618,7 +640,7 @@ function deleteRecode(thread_data)
     })
 }
 
-function searchRecode(thread_data,data)
+function searchRecode(thread_ID,data)
 {
     return new Promise((resolve,reject) =>
     {
@@ -626,7 +648,7 @@ function searchRecode(thread_data,data)
         xhr.open('POST','searchAjax.php',true);
         xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
         xhr.send(
-            'thread_id=' + encodeURIComponent(thread_data.threadinfo['thread_id']) + '&' + 
+            'thread_id=' + encodeURIComponent(thread_ID) + '&' + 
             'data='      + encodeURIComponent(data)
         );
     

@@ -529,3 +529,29 @@ div.main-form_item:last-child
     transition: opacity 0.2s ease-out, visibility 0.3s ease-out;
 }
 
+/* メッセージ表示用モーダルウィンドウ */
+.messagemodal
+{
+    width: 100vw;
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    top:43px;
+}
+
+.messagemodal.--scroling
+{
+    top:0px;
+}
+
+.messagemodal__body
+{
+    width:400px;
+    height: 50px;
+    background-color: #fafafa;
+    border:solid #bedcff;
+    border-width:0px 1px 1px 1px;
+    border-radius: 0 0 5px 5px;
+    align-content: center;
+    justify-content: center;
+}
