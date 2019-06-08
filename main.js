@@ -74,7 +74,7 @@ class thread
         return this._thread_id;
     }
 
-    IsActivationLowerLimit(scrollValue)
+    IsActivationPageTopLowerLimit(scrollValue)
     {
         return scrollValue < this._activationLowerLimit ;
     }
@@ -117,10 +117,11 @@ class thread
 
 }
 
-const thread_data = new thread;
+
 
 window.addEventListener('load',function(){
 
+    const thread_data = new thread;
     const submit = document.querySelector("#btnsubmit");
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
@@ -224,7 +225,7 @@ window.addEventListener('load',function(){
     scrollUpperBottom.addEventListener('click',() =>
     {
         //200未満は画面の移動をさせない
-        if(thread_data.IsActivationLowerLimit(document.documentElement.scrollTop))
+        if(thread_data.IsActivationPageTopLowerLimit(document.documentElement.scrollTop))
         {
             return;
         }
@@ -236,16 +237,29 @@ window.addEventListener('load',function(){
     window.document.addEventListener('scroll' ,() =>
     {
         //200未満はボタンの表示を半透明にし、押せない事を表現
-        if(thread_data.IsActivationLowerLimit(document.documentElement.scrollTop))
+        if(thread_data.IsActivationPageTopLowerLimit(document.documentElement.scrollTop))
         {
             scrollUpperBottom.classList.add('__inactive')
-            return;
         }
         else
         {
             //200以上は押せることを表現
             scrollUpperBottom.classList.remove('__inactive')
         }
+
+        /**メッセージモーダルの位置調整処理
+         * スクロールされたらTOP:0に固定する
+         */
+        if(document.documentElement.scrollTop > 23)
+        {
+            document.querySelector('.messagemodal').classList.add('--Pagetop');
+        }
+        else
+        {
+            document.querySelector('.messagemodal').classList.remove('--Pagetop');
+        }
+        
+
     },false);
 
 
@@ -344,18 +358,27 @@ window.addEventListener('load',function(){
 
     function deleteEvent(event)
     {
-        deleteRecode(thread_data).then(() =>
+        const delete_password = document.querySelector('.modalwindow__text').value;
+
+        searchRecode(thread_data.Thread_id,thread_data.DeletingID).then((result) =>
         {
-            searchRecode(thread_data.Thread_id,thread_data.DeletingID);
+            if(!result['IsPasswordVerifty'])
+            {
+                showMessageModal('削除に失敗しました。');
+            }
+            deleteRecode(thread_data);
         })
         .then((result) =>
         {
             modalWindowClose();
-            thread_data.validateSearchResult(result);
+            showMessageModal(thread_data.validateSearchResult(result));
+            closeMessageModal(5000);
         })
         .catch(($err) =>
         {
-
+            /**
+             * エラーの場合は、メッセージウィンドウにエラーを表示する
+             */
         })
     }
 
@@ -503,7 +526,29 @@ window.addEventListener('load',function(){
         })
     }
     
-    
+    function showMessageModal(MessageText)
+    {
+        let $MessageText = document.createElement('p');
+        $MessageText.classList.add('messagemodal__text');
+        $MessageText.appendChild(document.createTextNode(MessageText));
+
+        document.querySelector('.messagemodal__body').appendChild($MessageText);
+        document.querySelector('.messagemodal__body').classList.remove('messagemodal__body--is_hidden');
+    }
+
+    /**
+     * 
+     * @param {遅延時間} delayTime 
+     */
+    async function closeMessageModal(delayTime)
+    {
+        const result = await delayProcessing(delayTime);
+        if(result)
+        {
+            document.querySelector('.messagemodal__body').classList.add('messagemodal__body--is_hidden');
+            document.querySelector('.messagemodal__body').textContent = null;
+        }
+    }
 
     function createErrorDOM()
     {
@@ -537,137 +582,159 @@ window.addEventListener('load',function(){
         return fragment;
     }
     
-},false);
 
-//非同期スレッド内容取得処理
-function fetchCommentdata(sendingdata)
-{
-    return new Promise(function(resolve,reject)
+    /**非同期処理
+     * fetchCommentdata:DBからデータを取得
+     * insertInputData :DBへデータを登録
+     * deleteRecode    :DBからデータを削除(論理削除)
+     * 
+     */
+    function fetchCommentdata(sendingdata)
     {
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST','fetchAjax.php',true);
-        xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-
-
-        xhr.send(
-            sendingdata
-        );
-
-        xhr.onreadystatechange = function()
+        return new Promise(function(resolve,reject)
         {
-            switch(xhr.readyState)
-            {
-                case 4:
-                    if(xhr.status == 200)
-                    {
-                        let data = JSON.parse(xhr.responseText);
-                        resolve(data);
-                    }
-                    else if(xhr.status == 500)
-                    {
-                        reject('500')
-                    }
-                    break;
-            }
-        }
-    })
-}
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST','fetchAjax.php',true);
+            xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
 
-//非同期スレッド内容書き込み処理
-function insertInputData($array)
-{
-    return new Promise(function(resolve,reject)
-    {
-        let req = new XMLHttpRequest();
-        req.open('POST','insertAjax.php',true);
-        req.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-        req.send(
-            'name='         + encodeURIComponent($array['username'])      + '&' +
-            'email='        + encodeURIComponent($array['email'])         + '&' +
-            'delete_pass='  + encodeURIComponent($array['deletepass'])    + '&' +
-            'comment='      + encodeURIComponent($array['comment'])       + '&' +
-            'thread_id='    + encodeURIComponent($array['thread_id'])     + '&' +
-            'last_database_id='+ encodeURIComponent($array['last_database_id']),
+
+            xhr.send(
+                sendingdata
             );
 
-        req.onreadystatechange = function()
-        {
-            switch(req.readyState)
+            xhr.onreadystatechange = function()
             {
-                case 4:
-                    if(req.status == 200)
-                    {
-                        let result = JSON.parse(req.responseText);
-                        console.log(result);
-                        resolve(result);
-                    }
-                    break;
+                switch(xhr.readyState)
+                {
+                    case 4:
+                        if(xhr.status == 200)
+                        {
+                            let data = JSON.parse(xhr.responseText);
+                            resolve(data);
+                        }
+                        else if(xhr.status == 500)
+                        {
+                            reject('500')
+                        }
+                        break;
+                }
             }
-        }
-    })
-}
+        })
+    }
 
-function deleteRecode(thread_data)
-{
-    return new Promise((resolve,reject) =>
+    //非同期スレッド内容書き込み処理
+    function insertInputData($array)
     {
-        let xhr = new XMLHttpRequest();
-        /*論理削除でレコード削除を行う
-        *
-        */
-        xhr.open('POST','updateAjax.php',true);
-        //xhr.open('POST','deleteAjax.php',true);
-        xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-
-        xhr.send(
-            'thread_id='      + encodeURIComponent(thread_data.Thread_id) + '&' + 
-            'DeletingID='     + encodeURIComponent(thread_data.DeletingID)
-        );
-    
-        xhr.onreadystatechange = function()
+        return new Promise(function(resolve,reject)
         {
-            switch(xhr.readyState)
-            {
-                case 4:
-                    if(xhr.status == 200)
-                    {
-                        let data = JSON.parse(xhr.responseText);
-                        resolve(data);
-                    }
-                    break;
-            }
-        }
-    })
-}
+            let req = new XMLHttpRequest();
+            req.open('POST','insertAjax.php',true);
+            req.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
+            req.send(
+                'name='         + encodeURIComponent($array['username'])      + '&' +
+                'email='        + encodeURIComponent($array['email'])         + '&' +
+                'delete_pass='  + encodeURIComponent($array['deletepass'])    + '&' +
+                'comment='      + encodeURIComponent($array['comment'])       + '&' +
+                'thread_id='    + encodeURIComponent($array['thread_id'])     + '&' +
+                'last_database_id='+ encodeURIComponent($array['last_database_id']),
+                );
 
-function searchRecode(thread_ID,data)
-{
-    return new Promise((resolve,reject) =>
+            req.onreadystatechange = function()
+            {
+                switch(req.readyState)
+                {
+                    case 4:
+                        if(req.status == 200)
+                        {
+                            let result = JSON.parse(req.responseText);
+                            console.log(result);
+                            resolve(result);
+                        }
+                        break;
+                }
+            }
+        })
+    }
+
+    function deleteRecode(thread_data,delete_password)
     {
-        let xhr = new XMLHttpRequest();
-        xhr.open('POST','searchAjax.php',true);
-        xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-        xhr.send(
-            'thread_id=' + encodeURIComponent(thread_ID) + '&' + 
-            'data='      + encodeURIComponent(data)
-        );
-    
-        xhr.onreadystatechange = function()
+        return new Promise((resolve,reject) =>
         {
-            switch(xhr.readyState)
-            {
-                case 4:
-                    if(xhr.status == 200)
-                    {
-                        let data = JSON.parse(xhr.responseText);
+            let xhr = new XMLHttpRequest();
+            /*論理削除でレコード削除を行う
+            *
+            */
+            xhr.open('POST','updateAjax.php',true);
+            //xhr.open('POST','deleteAjax.php',true);
+            xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
 
-                        resolve(data);
-                    }
-                    break;
+            xhr.send(
+                'thread_id='      + encodeURIComponent(thread_data.Thread_id) + '&' + 
+                'DeletingID='     + encodeURIComponent(thread_data.DeletingID) + '&' +
+                'DeletePass='     + encodeURIComponent(delete_password)
+            );
+        
+            xhr.onreadystatechange = function()
+            {
+                switch(xhr.readyState)
+                {
+                    case 4:
+                        if(xhr.status == 200)
+                        {
+                            let data = JSON.parse(xhr.responseText);
+                            resolve(data);
+                        }
+                        break;
+                }
             }
-        }
-    })
-}
+        })
+    }
+
+    function searchRecode(thread_ID,data)
+    {
+        return new Promise((resolve,reject) =>
+        {
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST','searchAjax.php',true);
+            xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
+            xhr.send(
+                'thread_id=' + encodeURIComponent(thread_ID) + '&' + 
+                'data='      + encodeURIComponent(data)
+            );
+        
+            xhr.onreadystatechange = function()
+            {
+                switch(xhr.readyState)
+                {
+                    case 4:
+                        if(xhr.status == 200)
+                        {
+                            let data = JSON.parse(xhr.responseText);
+
+                            resolve(data);
+                        }
+                        break;
+                }
+            }
+        })
+    }
+
+    
+    function delayProcessing(delayTime)
+    {
+        console.log(delayTime);
+        return new Promise((resolve) =>
+        {
+            setTimeout(() =>
+            {
+                console.log('5秒まったよ');
+                resolve(true);
+            },delayTime);
+        })
+    }
+
+},false);
+
 
 
 
