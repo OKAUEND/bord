@@ -12,6 +12,7 @@ if(empty($_POST))
 
 $thread_id = $_POST['thread_id'];
 $response_no = explode(',',$_POST['data']);
+$delete_pass = $_POST['delete_pass'];
 
 try
 {
@@ -51,7 +52,17 @@ try
 
     $stmt = $pdo->plural($sql,$data);
     
-    $result = $stmt->fetchAll();
+    $value = $stmt->fetchAll();
+
+    //取得した値が存在するかどうかで判断する
+    $result = array(
+        //データが存在するか
+        'IsResult' => empty($value) ? true : false ,
+        //削除用パスが一致するか
+        'IsPasswordVerifty' => password_verify($value['delete_pass'],$delete_pass)? true : false ,
+        //一応取得したデータも返す
+        'Data' => $value
+    );
 
     echo json_encode($result);
 }

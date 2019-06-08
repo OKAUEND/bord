@@ -32,7 +32,7 @@ try
 
     $stmt = $pdo->plural($sql,$data);
 
-    echo json_encode(true);
+    echo json_encode($stmt);
 }
 catch(PDOException $e)
 {

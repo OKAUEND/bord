@@ -13,6 +13,12 @@ if(!empty($_POST))
     $comment        = $_POST['comment'];
     
     $ipAddres       = $_SERVER['REMOTE_ADDR'];
+
+    if(!empty($delete_pass))
+    {
+        $delete_pass = password_hash($delete_pass,PASSWORD_BCRYPT);
+    }
+
     try
     {
         $pdo = new DBconnect();
