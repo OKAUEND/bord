@@ -54,7 +54,7 @@ if(!empty($_POST))
             ':update_data'  => $time->format('Y-m-d H:i:s')
         );
 
-        $stmt = $pdo->execute_access($sql,$data);
+        $stmt = $pdo->IsExecuteAccess($sql,$data);
 
         echo json_encode($stmt);
         exit;

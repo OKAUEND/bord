@@ -115,6 +115,18 @@ class thread
         }
     }
 
+    IsTypeUndifined(value)
+    {
+        if(typeof value === 'undefined')
+        {
+            return true
+        }
+        else
+        {
+            return false
+        }
+    }
+
 }
 
 
@@ -125,8 +137,6 @@ window.addEventListener('load',function(){
     const submit = document.querySelector("#btnsubmit");
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
-
-    let loading_wait = false;
 
     //初回読み込み
     fetchCommentdata(thread_data.createFetchThread()).then((result) =>
@@ -143,72 +153,71 @@ window.addEventListener('load',function(){
         console.log('クリック');
         let comment = document.querySelector(".comment").value;
 
-        var wait = false;
-        if(comment.length == 0 && wait)
+        if(comment.length == 0 && thread_data.IsAjaxProcsessing)
         {
             return false;
         }
 
-        wait = true;
+        thread_data.IsAjaxProcsessing  = true;
         let input_list = [];
         input_list['username'] = document.querySelector(".username").value;
         input_list['email'] = document.querySelector(".email").value;
         input_list['deletepass'] = document.querySelector(".deletepass").value;
         input_list['comment'] = comment;
 
-        let tmp = thread_data.threadinfo;
+        let thread_list = thread_data.threadinfo;
 
-        let list = Object.assign(input_list,tmp);
-
+        let list = Object.assign(input_list,thread_list);
         insertInputData(list).then(() =>
         {
             return fetchCommentdata(thread_data.createFetchThread());
         })
         .then((result) => 
         {
-            if(result.length < 0)
+            if(thread_data.IsTypeUndifined(result))
             {
-                wait = false;
+                thread_data.IsAjaxProcsessing = false;
                 return;
             }
             appendDOMFragment(createDOMFragment(result,thread_data),thread_data);
-            wait = false;
+            thread_data.IsAjaxProcsessing = false;
         })
         .catch((err) =>
         {
+
             //エラー表示をモーダル画面で表示する(予定)
-            wait = false;
+            thread_data.IsAjaxProcsessing = false;
         });
     },false);
 
     //更新ボタン押下時のスレッド内容読み取り
     reload.addEventListener('click' ,() =>
     {
-        if(loading_wait)
+        if(thread_data.IsAjaxProcsessing)
         {
             return false;
         }
         const icon_reload = document.querySelector('.icon-reload');
         icon_reload.classList.add('__loading');
-        loading_wait = true;
+        thread_data.IsAjaxProcsessing = true;
 
         fetchCommentdata(thread_data.createFetchThread()).then((result) =>
         {
-            if(result.length = 0)
+            if(thread_data.IsTypeUndifined(result))
             {
-                loading_wait = false;
+                thread_data.IsAjaxProcsessing = false;
                 icon_reload.classList.remove('__loading');
                 return;
             }
             appendDOMFragment(createDOMFragment(result,thread_data),thread_data);
-            loading_wait = false;
+            thread_data.IsAjaxProcsessing = false;
             icon_reload.classList.remove('__loading');
         })
         .catch((err) =>
         {
             //エラー表示をモーダル画面で表示する(予定)
             icon_reload.classList.remove('__loading');
-            loading_wait = false;
+            thread_data.IsAjaxProcsessing = false;
         })
     },false);
 
@@ -250,7 +259,7 @@ window.addEventListener('load',function(){
         /**メッセージモーダルの位置調整処理
          * スクロールされたらTOP:0に固定する
          */
-        if(document.documentElement.scrollTop > 23)
+        if(document.documentElement.scrollTop > 15)
         {
             document.querySelector('.messagemodal').classList.add('--Pagetop');
         }
@@ -592,8 +601,6 @@ window.addEventListener('load',function(){
 
     /**非同期処理
      * fetchCommentdata:DBからデータを取得
-     * insertInputData :DBへデータを登録
-     * deleteRecode    :DBからデータを削除(論理削除)
      * 
      */
     function fetchCommentdata(sendingdata)
@@ -611,19 +618,26 @@ window.addEventListener('load',function(){
 
             xhr.onreadystatechange = function()
             {
-                switch(xhr.readyState)
+                try
                 {
-                    case 4:
-                        if(xhr.status == 200)
-                        {
-                            let data = JSON.parse(xhr.responseText);
-                            resolve(data);
-                        }
-                        else if(xhr.status == 500)
-                        {
-                            reject('500')
-                        }
-                        break;
+                    switch(xhr.readyState)
+                    {
+                        case 4:
+                            if(xhr.status == 200)
+                            {
+                                const result_data = JSON.parse(xhr.responseText);
+                                resolve(result_data);
+                            }
+                            else
+                            {
+                                reject();
+                            }
+                            break;
+                    }
+                }
+                catch(e)
+                {
+                    reject();
                 }
             }
         })
@@ -634,10 +648,10 @@ window.addEventListener('load',function(){
     {
         return new Promise(function(resolve,reject)
         {
-            let req = new XMLHttpRequest();
-            req.open('POST','insertAjax.php',true);
-            req.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
-            req.send(
+            let xhr = new XMLHttpRequest();
+            xhr.open('POST','insertAjax.php',true);
+            xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
+            xhr.send(
                 'name='         + encodeURIComponent($array['username'])      + '&' +
                 'email='        + encodeURIComponent($array['email'])         + '&' +
                 'delete_pass='  + encodeURIComponent($array['deletepass'])    + '&' +
@@ -646,18 +660,28 @@ window.addEventListener('load',function(){
                 'last_database_id='+ encodeURIComponent($array['last_database_id']),
                 );
 
-            req.onreadystatechange = function()
+            xhr.onreadystatechange = function()
             {
-                switch(req.readyState)
+                try
                 {
-                    case 4:
-                        if(req.status == 200)
-                        {
-                            let result = JSON.parse(req.responseText);
-                            console.log(result);
-                            resolve(result);
-                        }
-                        break;
+                    switch(xhr.readyState)
+                    {
+                        case 4:
+                            if(xhr.status == 200)
+                            {
+                                const result_data = JSON.parse(xhr.responseText);
+                                resolve(result_data);
+                            }
+                            else
+                            {
+                                reject();
+                            }
+                            break;
+                    }
+                }
+                catch(e)
+                {
+                    reject();
                 }
             }
         })
@@ -690,17 +714,20 @@ window.addEventListener('load',function(){
                         case 4:
                             if(xhr.status == 200)
                             {
-                                let data = JSON.parse(xhr.responseText);
-                                resolve(data);
+                                const result_data = JSON.parse(xhr.responseText);
+                                resolve(result_data);
+                            }
+                            else
+                            {
+                                reject();
                             }
                             break;
                     }
                 }
                 catch(e)
                 {
-
+                    reject();
                 }
-
             }
         })
     }
@@ -720,15 +747,26 @@ window.addEventListener('load',function(){
         
             xhr.onreadystatechange = function()
             {
-                switch(xhr.readyState)
+                try
                 {
-                    case 4:
-                        if(xhr.status == 200)
-                        {
-                            let data = JSON.parse(xhr.responseText);
-                            resolve(data);
-                        }
-                        break;
+                    switch(xhr.readyState)
+                    {
+                        case 4:
+                            if(xhr.status == 200)
+                            {
+                                const result_data = JSON.parse(xhr.responseText);
+                                resolve(result_data);
+                            }
+                            else
+                            {
+                                reject();
+                            }
+                            break;
+                    }
+                }
+                catch(e)
+                {
+                    reject();
                 }
             }
         })
