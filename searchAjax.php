@@ -54,12 +54,14 @@ try
     
     $value = $stmt->fetchAll();
 
+    $hash = $value[0]['delete_pass'];
+
     //取得した値が存在するかどうかで判断する
     $result = array(
         //データが存在するか
-        'IsResult' => empty($value) ? true : false ,
+        'IsResult' => !empty($value) ? true : false ,
         //削除用パスが一致するか
-        'IsPasswordVerifty' =>  IsPasswordMatched($delete_pass,$value[0]['delete_pass']) ,
+        'IsPasswordVerifty' =>  IsPasswordMatched($delete_pass,$hash) ,
         //一応取得したデータも返す
         'Data' => $value[0]
     );
