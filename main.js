@@ -103,9 +103,9 @@ class thread
         return sendingdata;
     }
 
-    validateSearchResult(data)
+    ExistsDeleteItem(IsResult)
     {
-        if(typeof data === 'undefined')
+        if(IsResult)
         {
             return '返信コメントの削除が完了しました。'
         }
@@ -359,19 +359,24 @@ window.addEventListener('load',function(){
     function deleteEvent(event)
     {
         const delete_password = document.querySelector('.modalwindow__text').value;
-
-        searchRecode(thread_data.Thread_id,thread_data.DeletingID).then((result) =>
+        searchRecode(thread_data.Thread_id,thread_data.DeletingID,delete_password).then((result) =>
         {
-            if(!result['IsPasswordVerifty'])
+            /**
+             * パスワードが一致し、レコードが存在している場合のみ削除処理を行う
+             */
+            modalWindowClose();
+            if(result['IsPasswordVerifty'] && result['IsResult'])
             {
-                showMessageModal('削除に失敗しました。');
+                deleteRecode(thread_data);
             }
-            deleteRecode(thread_data);
+            else
+            {
+                return false;
+            }
         })
         .then((result) =>
         {
-            modalWindowClose();
-            showMessageModal(thread_data.validateSearchResult(result));
+            showMessageModal(thread_data.ExistsDeleteItem(result));
             closeMessageModal(5000);
         })
         .catch(($err) =>
@@ -379,6 +384,8 @@ window.addEventListener('load',function(){
             /**
              * エラーの場合は、メッセージウィンドウにエラーを表示する
              */
+            showMessageModal('処理に失敗しました。');
+            closeMessageModal(5000);
         })
     }
 
@@ -676,21 +683,29 @@ window.addEventListener('load',function(){
         
             xhr.onreadystatechange = function()
             {
-                switch(xhr.readyState)
+                try
                 {
-                    case 4:
-                        if(xhr.status == 200)
-                        {
-                            let data = JSON.parse(xhr.responseText);
-                            resolve(data);
-                        }
-                        break;
+                    switch(xhr.readyState)
+                    {
+                        case 4:
+                            if(xhr.status == 200)
+                            {
+                                let data = JSON.parse(xhr.responseText);
+                                resolve(data);
+                            }
+                            break;
+                    }
                 }
+                catch(e)
+                {
+
+                }
+
             }
         })
     }
 
-    function searchRecode(thread_ID,data)
+    function searchRecode(thread_ID,data,delete_pass)
     {
         return new Promise((resolve,reject) =>
         {
@@ -699,7 +714,8 @@ window.addEventListener('load',function(){
             xhr.setRequestHeader('content-type','application/x-www-form-urlencoded;charset=UTF-8');
             xhr.send(
                 'thread_id=' + encodeURIComponent(thread_ID) + '&' + 
-                'data='      + encodeURIComponent(data)
+                'data='      + encodeURIComponent(data) + '&' + 
+                'delete_pass='+ encodeURIComponent(delete_pass)
             );
         
             xhr.onreadystatechange = function()
@@ -710,7 +726,6 @@ window.addEventListener('load',function(){
                         if(xhr.status == 200)
                         {
                             let data = JSON.parse(xhr.responseText);
-
                             resolve(data);
                         }
                         break;
