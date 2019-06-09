@@ -30,7 +30,7 @@ try
 
     $sql = 'UPDATE '.$table.' SET '.$column.'WHERE '.$Where;
 
-    $stmt = $pdo->plural($sql,$data);
+    $stmt = $pdo->IsExecuteAccess($sql,$data);
 
     echo json_encode($stmt);
 }
