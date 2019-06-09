@@ -432,7 +432,7 @@ div.main-form_item:last-child
     justify-content: center;
     align-items: center;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
 }
 
 .modalwindow__ui
@@ -456,6 +456,7 @@ div.main-form_item:last-child
     border-radius: 5px;
     font-size:16px;
     background-color: #fafafa;
+
 }
 
 .modalwindow__back
