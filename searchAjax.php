@@ -18,7 +18,7 @@ try
 {
     $pdo = new DBconnect();
 
-    $select = 'ID';
+    $select = 'ID,delete_pass';
     $from   = 'comment';
 
     $where = '';
@@ -59,9 +59,9 @@ try
         //データが存在するか
         'IsResult' => empty($value) ? true : false ,
         //削除用パスが一致するか
-        'IsPasswordVerifty' => password_verify($value['delete_pass'],$delete_pass)? true : false ,
+        'IsPasswordVerifty' =>  IsPasswordMatched($delete_pass,$value[0]['delete_pass']) ,
         //一応取得したデータも返す
-        'Data' => $value
+        'Data' => $value[0]
     );
 
     echo json_encode($result);
@@ -71,4 +71,26 @@ catch(Exception $e)
     //サーバーエラーとしてフロントにエラー情報を返す
     header("HTTP/1.1 500 Internal Server Error");
     die();
+}
+
+/**
+ * @param string $password
+ * @param string $hash
+ * @return bool
+ */
+function IsPasswordMatched($password,$hash)
+{
+    if(empty($password))
+    {
+        return false;
+    }
+
+    if(password_verify($password,$hash))
+    {
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
