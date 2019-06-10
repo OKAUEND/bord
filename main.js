@@ -149,7 +149,7 @@ window.addEventListener('load',function(){
     {
         let DOMFragment;
 
-        DOMFragment = createDOMFragment(result,thread_data)
+        DOMFragment = createDOMFragment(result)
         newCommentDOM(DOMFragment,thread_data);
         thread_data.threadinfo = result;
     });
@@ -185,7 +185,7 @@ window.addEventListener('load',function(){
                 thread_data.IsAjaxProcsessing = false;
                 return;
             }
-            appendDOMFragment(createDOMFragment(result,thread_data),thread_data);
+            appendDOMFragment(createDOMFragment(result,thread_data));
             thread_data.IsAjaxProcsessing = false;
         })
         .catch((err) =>
@@ -215,7 +215,7 @@ window.addEventListener('load',function(){
                 icon_reload.classList.remove('__loading');
                 return;
             }
-            appendDOMFragment(createDOMFragment(result,thread_data),thread_data);
+            appendDOMFragment(createDOMFragment(result,thread_data));
             thread_data.IsAjaxProcsessing = false;
             icon_reload.classList.remove('__loading');
         })
@@ -302,7 +302,7 @@ window.addEventListener('load',function(){
         return true;
     }
     
-    function createDOMFragment(fetchdata,thread_data)
+    function createDOMFragment(fetchdata)
     {
         let fragment = document.createDocumentFragment();  
         let response_No = thread_data.responseNo;
@@ -370,8 +370,8 @@ window.addEventListener('load',function(){
             //仮想ツリーにbodyを挿入
             fragment.appendChild($div);
         });
-    
-        thread_data.responseNo = response_No;
+
+        thread_data.responseNo = fetchdata[fetchdata.length -1]['ID'];
     
         return fragment;
     }
