@@ -297,6 +297,7 @@ div.main-form_item:last-child
     display: inline-block;
     font-style: normal;
     font-variant: normal;
+    pointer-events: none;
 }
 
 .__ui
