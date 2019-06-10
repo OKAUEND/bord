@@ -21,6 +21,7 @@ class thread
         this._IsAjaxProcsessing  = false;
         this._DeletingPlanID = 0;
         this._activationLowerLimit = 200;
+        this._closeSecTime = 5000;
     }
 
     set threadinfo(array)
@@ -72,6 +73,11 @@ class thread
     get Thread_id()
     {
         return this._thread_id;
+    }
+
+    get CloseSecTime()
+    {
+        return this._closeSecTime;
     }
 
     IsActivationPageTopLowerLimit(scrollValue)
@@ -286,11 +292,14 @@ window.addEventListener('load',function(){
     
        let comment_area = document.querySelector('#main-content');
        comment_area.appendChild($section);
+
+       return true;
     }
     
     function appendDOMFragment(DOMFragment)
     {
         document.querySelector('.main__body').appendChild(DOMFragment);
+        return true;
     }
     
     function createDOMFragment(fetchdata,thread_data)
@@ -301,12 +310,12 @@ window.addEventListener('load',function(){
        //取得した配列をループで回し、DOMを作成し表示する
         fetchdata.forEach(element => {
     
-            response_No += 1;
-    
             if(element['delete_flg'])
             {
                 return;
             }
+
+            response_No += 1;
     
             //レスのbody部分を作成する
             let $div = document.createElement('div');
@@ -334,7 +343,9 @@ window.addEventListener('load',function(){
     
             //削除用ボタンを作成
             let $button_delete = document.createElement('button');
-            $button_delete.classList.add('js-resdelete',element['ID']);
+            $button_delete.classList.add('js-resdelete');
+            //data属性を付与する
+            $button_delete.setAttribute('data-id',element['ID']);
             //モーダルウィンドウ展開のためのイベントリスナーを登録
             $button_delete.addEventListener('click',deleteModalWindowOpen,false);
     
@@ -376,7 +387,7 @@ window.addEventListener('load',function(){
             modalWindowClose();
             if(result['IsPasswordVerifty'] && result['IsResult'])
             {
-                deleteRecode(thread_data);
+                return deleteRecode(thread_data);
             }
             else
             {
@@ -386,7 +397,7 @@ window.addEventListener('load',function(){
         .then((result) =>
         {
             showMessageModal(thread_data.ExistsDeleteItem(result));
-            closeMessageModal(5000);
+            closeMessageModal(thread_data.CloseSecTime);
         })
         .catch(($err) =>
         {
@@ -394,7 +405,7 @@ window.addEventListener('load',function(){
              * エラーの場合は、メッセージウィンドウにエラーを表示する
              */
             showMessageModal('処理に失敗しました。');
-            closeMessageModal(5000);
+            closeMessageModal(thread_data.CloseSecTime);
         })
     }
 
@@ -403,7 +414,7 @@ window.addEventListener('load',function(){
         const DeleteMessagetitle = 'この書き込みを削除しますか？';
         const DeleteSubmitButtomText = '削除';
         const SubmitButtomDelete = '__deleting';
-        const DOMResNo = event.path[1].classList[1];
+        const DOMResNo = event.target.getAttribute('data-id');
     
         //モーダルウィンドウを表示する汎用の関数へ
         modalWindowOpen(DeleteMessagetitle,DeleteSubmitButtomText,SubmitButtomDelete);
@@ -479,6 +490,10 @@ window.addEventListener('load',function(){
     
         //削除キー入力欄が表示されていた場合、非表示にする
         const modalwindowDelInputform = document.querySelector('.modalwindow__text');
+        /**
+         * 入力したテキストを削除
+         */
+        modalwindowDelInputform.value = "";
         if(!modalwindowDelInputform.classList.contains('--hidden'))
         {
             modalwindowDelInputform.classList.add('--hidden');
@@ -502,22 +517,22 @@ window.addEventListener('load',function(){
         //DBからコメントを再取得する
         fetchCommentdata(thread_data.createFerchSingleData(DOMResNo)).then((result) => 
         {
-            /*データを取得できたか
-            * できなかった場合はエラー文を表示する
-            */
-            // if(result.length = 0)
-            // {
-            //     return;
-            // }
-            //ローディングアイコンを削除する
             modalItem.removeChild(modalItem.firstChild);
 
+            if(thread_data.IsTypeUndifined(result))
+            {
+                modalWindowClose();
+                showMessageModal('内容を取得できませんでした。時間を置いて再度操作を行ってください。')
+                closeMessageModal(thread_data.CloseSecTime);
+                return;
+            }
+
             /*表示する内容のDOMを作成する
-            * $response_text : 返信コメント
-            * $resoponse_time: 投稿時間
+            * @param string $response_text
+            * @param string $resoponse_time
             */
             let $response_text = document.createElement('p');
-            $response_text.classList.add('view_text');
+            $response_text.classList.add('main-content__text');
             $response_text.appendChild(document.createTextNode(result[0]['comment']));
     
             let $resoponse_time = document.createElement('p');
@@ -526,8 +541,6 @@ window.addEventListener('load',function(){
     
             modalItem.appendChild($response_text);
             modalItem.appendChild($resoponse_time);
-
-            console.log(result);
 
             //削除IDをクラスで保存しておく
             thread_data.DeletingID = result[0]['ID'];
@@ -565,39 +578,6 @@ window.addEventListener('load',function(){
             document.querySelector('.messagemodal__body').textContent = null;
         }
     }
-
-    function createErrorDOM()
-    {
-        let fragment = document.createDocumentFragment(); 
-        //レスのbody部分を作成する
-        let $div = document.createElement('div');
-        $div.classList.add('main-content__body');
-    
-        let $box = document.createElement('div');
-        $box.classList.add('main-content__item');
-        $box.classList.add('__error');
-    
-        //エラーアイコンを生成する
-        let $error_icon = document.createElement('i');
-        $error_icon.classList.add('icon-compose')
-        $error_icon.classList.add('icon-error')
-    
-        //文字列を生成する
-        let $error_txt   = document.createElement('p');
-        $error_txt.appendChild(document.createTextNode('内容を取得できませんでした。時間を置いて再度更新を行ってください'));
-        $error_txt.classList.add('main-content__errortxt');
-    
-        $box.appendChild($error_icon);
-        $box.appendChild($error_txt);
-    
-        $div.appendChild($box);
-    
-        //仮想ツリーにbodyを挿入
-        fragment.appendChild($div);
-    
-        return fragment;
-    }
-    
 
     /**非同期処理
      * fetchCommentdata:DBからデータを取得
@@ -780,7 +760,6 @@ window.addEventListener('load',function(){
         {
             setTimeout(() =>
             {
-                console.log('5秒まったよ');
                 resolve(true);
             },delayTime);
         })
