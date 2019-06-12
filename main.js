@@ -13,11 +13,9 @@ class thread
     {
         this._page_type = 'thread'; 
         this._thread_id = 0;
-        this._response_list = [];
         this._last_database_id = 0;
         this._last_update_time = null;
         this._last_res_no = 0;
-        this._initial_load = false;
         this._IsAjaxProcsessing  = false;
         this._DeletingPlanID = 0;
         this._activationLowerLimit = 200;
@@ -144,13 +142,11 @@ window.addEventListener('load',function(){
     const js_drawer = document.querySelector('.js-drawer');
     const reload = document.querySelector('.js-reload');
 
-    //初回読み込み
+    //初回読み込みを行
     fetchCommentdata(thread_data.createFetchThread()).then((result) =>
     {
-        let DOMFragment;
 
-        DOMFragment = createDOMFragment(result)
-        newCommentDOM(DOMFragment,thread_data);
+        newCommentDOM(createDOMFragment(result));
         thread_data.threadinfo = result;
     });
 
@@ -279,9 +275,10 @@ window.addEventListener('load',function(){
 
 
     /**
-     * 関数群
-     * イベント等で発火した処理を行うなど
-     * 
+     * 返信レスのDOMの作成を行う
+     * 初回ロード時に行う処理なので、section部分から作成しそれにFragmentを挿入
+     * @param Fragment :DOMFragment
+     * @return boolean 
      * **/
     function newCommentDOM(DOMFragment)
     {
@@ -296,6 +293,12 @@ window.addEventListener('load',function(){
        return true;
     }
     
+    /**
+     * 返信レスのDOMの作成を行う
+     * 2回目以降の作成なのでsetion部分の作成等は省き、既存のDOMにFragmentを挿入
+     * @param Fragment :DOMFragment
+     * @return boolean 
+     * **/
     function appendDOMFragment(DOMFragment)
     {
         document.querySelector('.main__body').appendChild(DOMFragment);
@@ -307,7 +310,7 @@ window.addEventListener('load',function(){
         let fragment = document.createDocumentFragment();  
         let response_No = thread_data.responseNo;
     
-       //取得した配列をループで回し、DOMを作成し表示する
+       //取得した配列をループで一つ一つの要素を抜き出し
         fetchdata.forEach(element => {
     
             if(element['delete_flg'])
@@ -359,7 +362,7 @@ window.addEventListener('load',function(){
             $p_comment.appendChild(document.createTextNode(element['comment']));
             $p_comment.classList.add('main-content__text');
     
-            //作成したDOMをbodyタグに挿入
+            //最後に挿入処理を置くことで、表示順番管理をしやすいようにする
             $div.appendChild($ResNo);
             $div.appendChild($p_comment);
             $div.appendChild($DB_no);
@@ -367,16 +370,16 @@ window.addEventListener('load',function(){
             $div.appendChild($span_writingtime);
             $div.appendChild($button_delete);
     
-            //仮想ツリーにbodyを挿入
             fragment.appendChild($div);
         });
 
+        //取得データの最後のDBIDを保持することで、どこまで読み込んだかを覚えておくようにする
         thread_data.responseNo = fetchdata[fetchdata.length -1]['ID'];
     
         return fragment;
     }
 
-    function deleteEvent(event)
+    function deleteEvent()
     {
         const delete_password = document.querySelector('.modalwindow__text').value;
         searchRecode(thread_data.Thread_id,thread_data.DeletingID,delete_password).then((result) =>
@@ -385,6 +388,8 @@ window.addEventListener('load',function(){
              * パスワードが一致し、レコードが存在している場合のみ削除処理を行う
              */
             modalWindowClose();
+            //API側で判定したパスワード一致チェックとデータ取得チェックの両方が真でない場合は、削除処理を行わない
+            //真でない場合は、削除ができない事を通知
             if(result['IsPasswordVerifty'] && result['IsResult'])
             {
                 return deleteRecode(thread_data);
