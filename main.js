@@ -388,8 +388,7 @@ window.addEventListener('load',function(){
              * パスワードが一致し、レコードが存在している場合のみ削除処理を行う
              */
             modalWindowClose();
-            //API側で判定したパスワード一致チェックとデータ取得チェックの両方が真でない場合は、削除処理を行わない
-            //真でない場合は、削除ができない事を通知
+            //API側で判定し、フロント側では真偽値チェックのみにすることで、フロントから判定処理を読み取られるのを防止
             if(result['IsPasswordVerifty'] && result['IsResult'])
             {
                 return deleteRecode(thread_data);
@@ -401,6 +400,7 @@ window.addEventListener('load',function(){
         })
         .then((result) =>
         {
+            //真偽値でメッセージ内容を変えるようにし、機能をなるべく分けて汎用性をあげる
             showMessageModal(thread_data.ExistsDeleteItem(result));
             closeMessageModal(thread_data.CloseSecTime);
         })
