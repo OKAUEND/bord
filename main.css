@@ -506,13 +506,13 @@ div.main-form_item:last-child
     margin:5px;
 }
 
-.js-modalButton.__Submit
+.js-modalButton--submit
 {
     border: 2px solid #1da1f2;
     background-color: #1da1f2;
 }
 
-.js-modalButton.__deleting
+.js-modalButton--deleting
 {
     border: 2px solid #f21d1d;
     background-color: #f21d1d;
