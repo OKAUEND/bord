@@ -37,29 +37,29 @@
                 </section>
             </article>
             <section class="js-userinterface">
-                <button class="js-userinterface__item js-scrollupper __inactive">
+                <button class="js-userinterface__item js-scrollupper __inactive js-tabControl">
                     <i class="icon-compose __ui icon-scrollupper"></i>
                 </button>
-                <button class="js-userinterface__item js-reload">
+                <button class="js-userinterface__item js-reload js-tabControl">
                     <i class="icon-compose __ui icon-reload"></i>
                 </button>
-                <button class="js-userinterface__item js-drawer">
+                <button class="js-userinterface__item js-drawer js-tabControl">
                     <i class="icon-compose __ui icon-formopen"></i>
                 </button>
             </section>
             <section class="modalwindow --is_show">
                 <div class="modalwindow__body">
-                    <div class="modalwindow__title">
+                    <div class="modalwindow__header">
                         <p class="title_text"></p>
-                        <button class="js_modalWindow__close">
+                        <button class="js_modalWindow__close js-tabControl js-FocusItemsInModal">
                             <i class="icon-compose icon-close"></i>
                         </button>
                     </div>
                     <div class="modalwindow__item"></div>
-                    <div class="modalwindow__ui">
-                        <input type="text" class="modalwindow__text --hidden"></input>
-                        <button class = 'js-modalButton modalButtom__Cancel button_text'>キャンセル</button>
-                        <button class = 'js-modalButton modalButtom__Submit button_text'></button>
+                    <div class="modalwindow__footer">
+                        <input type="text" class="modalwindow__text --hidden js-tabControl js-FocusItemsInModal" ></input>
+                        <button class = 'js-modalButton modalButtom__Cancel js-tabControl js-FocusItemsInModal'>キャンセル</button>
+                        <button class = 'js-modalButton modalButtom__Submit js-tabControl js-FocusItemsInModal'></button>
                     </div>
                 </div>
                 <div class="modalwindow__back --is_active"></div>

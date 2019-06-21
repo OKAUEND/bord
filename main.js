@@ -1,141 +1,139 @@
-//スレッドデータ管理クラス
-class thread
-{
-    // Firefoxだと未対応なのでコメントアウト;;
-    // _page_type;
-    // _thread_id;
-    // _response_list;
-    // _last_database_id;
-    // _last_update_time;
-    // _last_res_no;
-
-    constructor()
-    {
-        this._page_type = 'thread'; 
-        this._thread_id = 0;
-        this._last_database_id = 0;
-        this._last_update_time = null;
-        this._last_res_no = 0;
-        this._IsAjaxProcsessing  = false;
-        this._DeletingPlanID = 0;
-        this._activationLowerLimit = 200;
-        this._closeSecTime = 5000;
-    }
-
-    set threadinfo(array)
-    {
-        let data = array[array.length - 1]
-        this._last_database_id = Number(data['ID']);
-        this._last_update_time = data['create_data'];
-    }
-
-    get threadinfo()
-    {
-        let result = [];
-        result['page_type']     = this._page_type;
-        result['thread_id']     = this._thread_id;
-        result['last_database_id']  = this._last_database_id;
-        result['last_update_time'] = this._last_update_time;
-        return result;
-    }
-
-    set responseNo(res_no)
-    {
-        this._last_res_no = res_no;
-    }
-    get responseNo()
-    {
-        return this._last_res_no;
-    }
-
-    set IsAjaxProcsessing(bool)
-    {
-        this._IsAjaxProcsessing = bool;
-    }
-
-    get IsAjaxProcsessing()
-    {
-        return this._IsAjaxProcsessing;
-    }
-
-    set DeletingID(ID)
-    {
-        this._DeletingPlanID = ID;
-    }
-
-    get DeletingID()
-    {
-        return this._DeletingPlanID;
-    }
-
-    get Thread_id()
-    {
-        return this._thread_id;
-    }
-
-    get CloseSecTime()
-    {
-        return this._closeSecTime;
-    }
-
-    IsActivationPageTopLowerLimit(scrollValue)
-    {
-        return scrollValue < this._activationLowerLimit ;
-    }
-
-    createFetchThread()
-    {
-        const sendingdata = 
-        'fetch_mode='        + encodeURIComponent('all')   + '&' +  
-        'page_type='         + encodeURIComponent(this._page_type)   + '&' +
-        'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
-        'last_res_no='       + encodeURIComponent(this._last_res_no) + '&' +  
-        'last_res_time='     + encodeURIComponent(this._last_update_time) ;
-
-        return sendingdata;
-    }
-
-    createFerchSingleData(resno)
-    {
-        const sendingdata = 
-        'fetch_mode='        + encodeURIComponent('single')   + '&' +  
-        'page_type='         + encodeURIComponent(this._page_type)   + '&' +
-        'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
-        'last_res_no='       + encodeURIComponent(resno) + '&' +  
-        'last_res_time='     + encodeURIComponent(this._last_update_time) ;
-
-        return sendingdata;
-    }
-
-    ExistsDeleteItem(IsResult)
-    {
-        if(IsResult)
-        {
-            return '返信コメントの削除が完了しました。'
-        }
-        else
-        {
-            return '削除に失敗しました。'
-        }
-    }
-
-    IsTypeUndifined(value)
-    {
-        if(typeof value === 'undefined')
-        {
-            return true
-        }
-        else
-        {
-            return false
-        }
-    }
-
-}
-
-
-
 window.addEventListener('load',function(){
+
+    //スレッドデータ管理クラス
+    class thread
+    {
+        // Firefoxだと未対応なのでコメントアウト;;
+        // _page_type;
+        // _thread_id;
+        // _response_list;
+        // _last_database_id;
+        // _last_update_time;
+        // _last_res_no;
+
+        constructor()
+        {
+            this._page_type = 'thread'; 
+            this._thread_id = 0;
+            this._last_database_id = 0;
+            this._last_update_time = null;
+            this._last_res_no = 0;
+            this._IsAjaxProcsessing  = false;
+            this._DeletingPlanID = 0;
+            this._activationLowerLimit = 200;
+            this._closeSecTime = 5000;
+        }
+
+        set threadinfo(array)
+        {
+            let data = array[array.length - 1]
+            this._last_database_id = Number(data['ID']);
+            this._last_update_time = data['create_data'];
+        }
+
+        get threadinfo()
+        {
+            let result = [];
+            result['page_type']     = this._page_type;
+            result['thread_id']     = this._thread_id;
+            result['last_database_id']  = this._last_database_id;
+            result['last_update_time'] = this._last_update_time;
+            return result;
+        }
+
+        set responseNo(res_no)
+        {
+            this._last_res_no = res_no;
+        }
+        get responseNo()
+        {
+            return this._last_res_no;
+        }
+
+        set IsAjaxProcsessing(bool)
+        {
+            this._IsAjaxProcsessing = bool;
+        }
+
+        get IsAjaxProcsessing()
+        {
+            return this._IsAjaxProcsessing;
+        }
+
+        set DeletingID(ID)
+        {
+            this._DeletingPlanID = ID;
+        }
+
+        get DeletingID()
+        {
+            return this._DeletingPlanID;
+        }
+
+        get Thread_id()
+        {
+            return this._thread_id;
+        }
+
+        get CloseSecTime()
+        {
+            return this._closeSecTime;
+        }
+
+        IsActivationPageTopLowerLimit(scrollValue)
+        {
+            return scrollValue < this._activationLowerLimit ;
+        }
+
+        createFetchThread()
+        {
+            const sendingdata = 
+            'fetch_mode='        + encodeURIComponent('all')   + '&' +  
+            'page_type='         + encodeURIComponent(this._page_type)   + '&' +
+            'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
+            'last_res_no='       + encodeURIComponent(this._last_res_no) + '&' +  
+            'last_res_time='     + encodeURIComponent(this._last_update_time) ;
+
+            return sendingdata;
+        }
+
+        createFerchSingleData(resno)
+        {
+            const sendingdata = 
+            'fetch_mode='        + encodeURIComponent('single')   + '&' +  
+            'page_type='         + encodeURIComponent(this._page_type)   + '&' +
+            'thread_id='         + encodeURIComponent(this._thread_id)   + '&' +
+            'last_res_no='       + encodeURIComponent(resno) + '&' +  
+            'last_res_time='     + encodeURIComponent(this._last_update_time) ;
+
+            return sendingdata;
+        }
+
+        ExistsDeleteItem(IsResult)
+        {
+            if(IsResult)
+            {
+                return '返信コメントの削除が完了しました。'
+            }
+            else
+            {
+                return '削除に失敗しました。'
+            }
+        }
+
+        IsTypeUndifined(value)
+        {
+            if(typeof value === 'undefined')
+            {
+                return true
+            }
+            else
+            {
+                return false
+            }
+        }
+
+    }
 
     const thread_data = new thread;
     const submit = document.querySelector("#btnsubmit");
@@ -309,6 +307,8 @@ window.addEventListener('load',function(){
     {
         let fragment = document.createDocumentFragment();  
         let response_No = thread_data.responseNo;
+
+        const addEvent = deleteModalWindowOpen;
     
        //取得した配列をループで一つ一つの要素を抜き出し
         fetchdata.forEach(element => {
@@ -346,11 +346,13 @@ window.addEventListener('load',function(){
     
             //削除用ボタンを作成
             let $button_delete = document.createElement('button');
-            $button_delete.classList.add('js-resdelete');
+            $button_delete.classList.add('js-resdelete','js-userinterface__item');
             //data属性を付与する
             $button_delete.setAttribute('data-id',element['ID']);
+            //tabIndex属性を付与する
             //モーダルウィンドウ展開のためのイベントリスナーを登録
-            $button_delete.addEventListener('click',deleteModalWindowOpen,false);
+            $button_delete.addEventListener('click',addEvent,false);
+            $button_delete.addEventListener('keydown',TabkeyFocusControl,false);
     
             //削除アイコンを追加
             let $i_delete_icon = document.createElement('i');
@@ -379,7 +381,7 @@ window.addEventListener('load',function(){
         return fragment;
     }
 
-    function deleteEvent()
+    let deleteEvent = function()
     {
         const delete_password = document.querySelector('.modalwindow__text').value;
         searchRecode(thread_data.Thread_id,thread_data.DeletingID,delete_password).then((result) =>
@@ -414,11 +416,11 @@ window.addEventListener('load',function(){
         })
     }
 
-    function deleteModalWindowOpen(event)
+    const deleteModalWindowOpen = function(event)
     {
         const DeleteMessagetitle = 'この書き込みを削除しますか？';
         const DeleteSubmitButtomText = '削除';
-        const SubmitButtomDelete = '__deleting';
+        const SubmitButtomDelete = 'js-modalButton--deleting';
         const DOMResNo = event.target.getAttribute('data-id');
     
         //モーダルウィンドウを表示する汎用の関数へ
@@ -440,15 +442,18 @@ window.addEventListener('load',function(){
         ShowDeletingContent(DOMResNo)
     }
     
+    let IsModalWindowOpen = false;
+
     function modalWindowOpen(titleText,buttonText,submitClassName)
     {
+        IsModalWindowOpen = true;
         //モーダルウィンドウを展開する処理へ変更
         //モーダルウィンドウ表示時はスクロールを行えないように設定
         //スクロールバーを非表示に
         document.querySelector('#body').classList.add('__is-show');
         //モーダルウィンドウの各種を表示
         document.querySelector('.modalwindow').classList.remove('--is_show');
-        document.querySelector('.modalwindow__body').classList.remove('--is_show');
+        // document.querySelector('.modalwindow__body').classList.remove('--is_show');
         document.querySelector('.modalwindow__back').classList.remove('--is_active');
     
         //タイトルを設定する
@@ -467,17 +472,18 @@ window.addEventListener('load',function(){
         document.querySelector('.js_modalWindow__close').addEventListener('click',modalWindowClose,false);
     }
     
-    function modalWindowClose()
+    const modalWindowClose =  function()
     {
         //スクロールバーを表示する
         document.querySelector('#body').classList.remove('__is-show');
     
         //モーダルウィンドウを非表示に
         document.querySelector('.modalwindow').classList.add('--is_show');
-        document.querySelector('.modalwindow__body').classList.add('--is_show');
+        // document.querySelector('.modalwindow__body').classList.add('--is_show');
         document.querySelector('.modalwindow__back').classList.add('--is_active');
     
         //モーダルウィンドウのタイトル部分にあたるテキストを削除する
+        //最初の要素がテキストの要素であることが確定なので、firstchildで指定しそれをremoveする
         const modalWindowTitleText = document.querySelector('.title_text');
         modalWindowTitleText.removeChild(modalWindowTitleText.firstChild);
     
@@ -495,20 +501,24 @@ window.addEventListener('load',function(){
     
         //削除キー入力欄が表示されていた場合、非表示にする
         const modalwindowDelInputform = document.querySelector('.modalwindow__text');
+
         /**
-         * 入力したテキストを削除
+         * 入力したパスワードを削除
+         * valueの要素を空文字にする
          */
         modalwindowDelInputform.value = "";
         if(!modalwindowDelInputform.classList.contains('--hidden'))
         {
             modalwindowDelInputform.classList.add('--hidden');
         }
-    
+
         //モーダルウィンドウのバック黒画面をクリックしたときのイベントを削除
         document.querySelector('.modalwindow__back').removeEventListener('click',modalWindowClose,false);
+
+        IsModalWindowOpen= false;
     }
     
-    function ShowDeletingContent(DOMResNo)
+    let ShowDeletingContent = function(DOMResNo)
     {
         //連続クリックで処理が重複しないように、非同期処理中である事を示すフラグをONにする
         thread_data.IsAjaxProcsessing = true;
@@ -569,6 +579,43 @@ window.addEventListener('load',function(){
         document.querySelector('.messagemodal__body').appendChild($MessageText);
         document.querySelector('.messagemodal__body').classList.remove('messagemodal__body--is_hidden');
     }
+
+    const addTabKeyEventMultiType = function(elements,eventTypes,listener,useCaptuer)
+    {
+        elements.forEach(element => {
+            element.addEventListener(eventTypes,listener,useCaptuer);
+        })
+    }
+
+    const TabkeyFocusControl = function(event)
+    {
+        if(event.key != 'Tab')
+        {
+            return;
+        }
+        event.preventDefault();
+        let InterfaceItems;
+        if(IsModalWindowOpen)
+        {
+            InterfaceItems = document.querySelectorAll('.js-FocusItemsInModal');
+        }
+        else
+        {
+            InterfaceItems = document.querySelectorAll('.js-userinterface__item');
+        }
+        const nextIndex = [].findIndex.call(InterfaceItems, e => e === event.target);
+        if(InterfaceItems.length != (nextIndex + 1))
+        {
+            InterfaceItems[nextIndex + 1].focus();
+        }
+        else
+        {
+            InterfaceItems[0].focus();
+        }
+    }
+
+    const ui_items = document.querySelectorAll('.js-tabControl');
+    addTabKeyEventMultiType(ui_items,'keydown',TabkeyFocusControl,false);
 
     /**
      * 
