@@ -593,8 +593,12 @@ window.addEventListener('load',function(){
         {
             return;
         }
+        //次の要素を指定させたいので、デフォルト動作をさせなくする
         event.preventDefault();
         let InterfaceItems;
+
+        //モーダルウィンドウ表示時は、モーダルウィンドウ内のみで指定させたいので、
+        //モーダルウィンドウの要素だけを取得
         if(IsModalWindowOpen)
         {
             InterfaceItems = document.querySelectorAll('.js-FocusItemsInModal');
@@ -603,7 +607,12 @@ window.addEventListener('load',function(){
         {
             InterfaceItems = document.querySelectorAll('.js-userinterface__item');
         }
+
+        //イベントで取得した要素と一致している配列のインデックスを取得
         const nextIndex = [].findIndex.call(InterfaceItems, e => e === event.target);
+
+        //取得した配列数と次の指定したいインデックス数を比較させ、違う場合は次の要素を指定し、同じ場合は一番最初の要素を指定させ、
+        //ループできるようにする
         if(InterfaceItems.length != (nextIndex + 1))
         {
             InterfaceItems[nextIndex + 1].focus();
