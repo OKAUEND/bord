@@ -267,10 +267,9 @@ window.addEventListener('load',function(){
         {
             document.querySelector('.messagemodal').classList.remove('--Pagetop');
         }
-        
+    },{ passive: false });
 
-    },false);
-
+    let IsModalWindowOpen = false;
 
     /**
      * 返信レスのDOMの作成を行う
@@ -346,7 +345,7 @@ window.addEventListener('load',function(){
     
             //削除用ボタンを作成
             let $button_delete = document.createElement('button');
-            $button_delete.classList.add('js-resdelete','js-userinterface__item');
+            $button_delete.classList.add('js-resdelete','js-FocusItems');
             //data属性を付与する
             $button_delete.setAttribute('data-id',element['ID']);
             //tabIndex属性を付与する
@@ -441,8 +440,6 @@ window.addEventListener('load',function(){
         //削除内容を表示する処理を行う
         ShowDeletingContent(DOMResNo)
     }
-    
-    let IsModalWindowOpen = false;
 
     function modalWindowOpen(titleText,buttonText,submitClassName)
     {
@@ -605,7 +602,7 @@ window.addEventListener('load',function(){
         }
         else
         {
-            InterfaceItems = document.querySelectorAll('.js-userinterface__item');
+            InterfaceItems = document.querySelectorAll('.js-FocusItems');
         }
 
         //イベントで取得した要素と一致している配列のインデックスを取得

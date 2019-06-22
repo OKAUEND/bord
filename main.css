@@ -113,13 +113,6 @@ ul,li
     display: none;
 }
 
-.button_text
-{
-    font-size:14px;
-    font-weight: bold;
-    line-height: 20px;
-}
-
 /* 入力フォーム */
 #main-form
 {
@@ -271,6 +264,11 @@ div.main-form_item:last-child
     margin-bottom: 5px;
 }
 
+.js-userinterface__item:focus
+{
+    border:4px solid #f2c01d;
+}
+
 .__inactive
 {
     opacity: 0.5;
@@ -286,9 +284,15 @@ div.main-form_item:last-child
 {
     background-color: #ffffff00;;
     border:none;
+    border-radius: 2px;
     padding: 0;
     width:15px;
     height:20px;
+}
+
+.js-resdelete:focus
+{
+    background: #f89364;
 }
 
 .icon-compose
@@ -411,7 +415,7 @@ div.main-form_item:last-child
     border-radius:5px;
 }
 
-.modalwindow__title
+.modalwindow__header
 {
     margin:0;
     padding:0;
@@ -436,7 +440,7 @@ div.main-form_item:last-child
     flex-direction: column;
 }
 
-.modalwindow__ui
+.modalwindow__footer
 {
     margin:0;
     padding:5px;
@@ -474,6 +478,16 @@ div.main-form_item:last-child
     background-color: #ffffff;
 }
 
+.modalButtom__Cancel:focus
+{
+    border:3px solid #1da1f2;
+}
+
+.modalButtom__Submit:focus
+{
+    border:3px solid #b4b4b4;
+}
+
 .title_text
 {
     width: 100%;
@@ -487,7 +501,7 @@ div.main-form_item:last-child
     height: 30px;
     padding:0;
     background-color: rgba(255, 255, 255, 0);
-    border:0;
+    border:3px solid #fafafa00;
     border-radius: 5px;
     position: absolute;
     right: 5px;
@@ -495,8 +509,12 @@ div.main-form_item:last-child
 
 .js_modalWindow-close:hover
 {
-    background-color: #cccccc;
-    transition: background-color 0.2s ease-out, visibility 0.3s ease-out;
+    border:3px solid #f2c01d;
+}
+
+.js_modalWindow__close:focus
+{
+    border:3px solid #f2c01d;
 }
 
 .js-modalButton
@@ -504,6 +522,9 @@ div.main-form_item:last-child
     border-radius: 20px;
     padding:6px 16px;
     margin:5px;
+    font-size:14px;
+    font-weight: bold;
+    line-height: 20px;
 }
 
 .js-modalButton--submit
